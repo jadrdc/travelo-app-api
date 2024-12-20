@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.ktor)
 }
 
-group = "com.agusteam"
+group = "com.agusteam.travelo"
 version = "0.0.1"
 
 application {

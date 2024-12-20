@@ -1,9 +1,9 @@
-package com.agusteam
+package com.agusteam.travelo
 
-import com.agusteam.models.Priority
-import com.agusteam.models.TaskModel
-import com.agusteam.models.TaskRepository
-import com.agusteam.models.tasksAsTable
+import com.agusteam.travelo.models.Priority
+import com.agusteam.travelo.models.TaskModel
+import com.agusteam.travelo.models.TaskRepository
+import com.agusteam.travelo.models.tasksAsTable
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*

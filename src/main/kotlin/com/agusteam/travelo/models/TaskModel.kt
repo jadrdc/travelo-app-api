@@ -1,4 +1,4 @@
-package com.agusteam.models
+package com.agusteam.travelo.models
 
 data class TaskModel(
     val name: String,

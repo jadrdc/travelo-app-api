@@ -1,4 +1,4 @@
-package com.agusteam.models
+package com.agusteam.travelo.models
 
 object TaskRepository {
     private val tasks = mutableListOf(

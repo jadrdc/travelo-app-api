@@ -1,4 +1,4 @@
-package com.agusteam
+package com.agusteam.travelo
 
 import io.ktor.server.application.*
 
