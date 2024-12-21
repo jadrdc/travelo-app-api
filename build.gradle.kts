@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
+    kotlin("plugin.serialization") version "1.9.10"  // For Kotlin Serialization plugin
 }
 
 group = "com.agusteam.travelo"
@@ -19,6 +20,7 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.jetbrains.kotlinx.serialization)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)

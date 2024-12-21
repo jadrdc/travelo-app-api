@@ -1,5 +1,8 @@
 package com.agusteam.travelo.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable()
 data class TaskModel(
     val name: String,
     val description: String,

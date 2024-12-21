@@ -1,12 +1,11 @@
 package com.agusteam.travelo
 
-import com.agusteam.travelo.models.Priority
-import com.agusteam.travelo.models.TaskModel
-import com.agusteam.travelo.models.TaskRepository
-import com.agusteam.travelo.models.tasksAsTable
+import com.agusteam.travelo.models.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -18,9 +17,44 @@ fun Application.configureRouting() {
             call.respondText("App in illegal state as ${cause.message}")
         }
     }
+    install(ContentNegotiation) {
+        json()  // Use Kotlinx Serialization with JSON format
+    }
     routing {
         staticResources("/task-ui", "task-ui")
+
+        route("/users") {
+            post {
+                val userReq = call.receive<UserSignupModel>()
+                try {
+                    if (userReq.validate()) {
+                        call.respond(HttpStatusCode.BadRequest)
+                    } else {
+
+                    }
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.BadRequest)
+
+                }
+            }
+        }
+
+
+
+
+
+
         route("/tasks") {
+            get("/lists") {
+                call.respond(
+                    listOf(
+                        TaskModel("cleaning", "Clean the house", Priority.Low),
+                        TaskModel("gardening", "Mow the lawn", Priority.Medium),
+                        TaskModel("shopping", "Buy the groceries", Priority.High),
+                        TaskModel("painting", "Paint the fence", Priority.Medium)
+                    )
+                )
+            }
             get("/byName/{taskName}") {
                 val taskName = call.parameters["taskName"]
                 if (taskName.isNullOrBlank()) {
