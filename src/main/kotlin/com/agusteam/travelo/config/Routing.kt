@@ -1,10 +1,12 @@
-package com.agusteam.travelo
+package com.agusteam.travelo.config
 
-import com.agusteam.travelo.models.*
+import com.agusteam.travelo.domain.models.Priority
+import com.agusteam.travelo.domain.models.TaskModel
+import com.agusteam.travelo.domain.models.TaskRepository
+import com.agusteam.travelo.domain.models.tasksAsTable
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.http.content.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
@@ -21,28 +23,6 @@ fun Application.configureRouting() {
         json()  // Use Kotlinx Serialization with JSON format
     }
     routing {
-        staticResources("/task-ui", "task-ui")
-
-        route("/users") {
-            post {
-                val userReq = call.receive<UserSignupModel>()
-                try {
-                    if (userReq.validate()) {
-                        call.respond(HttpStatusCode.BadRequest)
-                    } else {
-
-                    }
-                } catch (e: Exception) {
-                    call.respond(HttpStatusCode.BadRequest)
-
-                }
-            }
-        }
-
-
-
-
-
 
         route("/tasks") {
             get("/lists") {
