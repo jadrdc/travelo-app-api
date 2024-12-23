@@ -14,7 +14,7 @@ class SignUpUserUseCase(
     val validator: FieldValidator
 ) {
 
-    suspend fun comfirmEmail(model: ConfirmEmailModel): OperationResult<Boolean> {
+    suspend fun confirmEmail(model: ConfirmEmailModel): OperationResult<Boolean> {
         return repository.comfirmEmail(model.userId)
     }
     suspend fun login(model: LoginModel): OperationResult<LogonUserModel> {

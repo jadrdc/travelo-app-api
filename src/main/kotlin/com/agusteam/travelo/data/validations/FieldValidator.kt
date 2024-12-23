@@ -34,20 +34,21 @@ class FieldValidator {
         val errors = mutableListOf<String>()
 
         if (!validateEmail(user.email)) {
-            errors.add("Invalid email format")
+            errors.add("Formato de correo electrónico inválido")
         }
         if (!validatePhone(user.phone)) {
-            errors.add("Invalid phone number format")
+            errors.add("Formato de número de teléfono inválido")
         }
         if (!validatePassword(user.password)) {
-            errors.add("Password must be at least 8 characters long, contain uppercase, lowercase, a digit, and a special character.")
+            errors.add("La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un dígito y un carácter especial.")
         }
         if (user.name.isBlank()) {
-            errors.add("Name cannot be blank")
+            errors.add("El nombre no puede estar vacío")
         }
         if (user.lastname.isBlank()) {
-            errors.add("Lastname cannot be blank")
+            errors.add("El apellido no puede estar vacío")
         }
+
 
         return errors
     }

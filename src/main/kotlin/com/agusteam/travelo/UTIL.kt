@@ -1,8 +1,10 @@
 package com.agusteam.travelo
 
 import com.agusteam.travelo.data.dao.UserProfileDao
+import com.agusteam.travelo.data.impl.UserProfileRepositoryImp
 import com.agusteam.travelo.data.impl.UserSignUpRepositoryImp
 import com.agusteam.travelo.data.validations.FieldValidator
+import com.agusteam.travelo.domain.usecase.GetProfileDetailsUseCase
 import com.agusteam.travelo.domain.usecase.SignUpUserUseCase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
@@ -32,5 +34,8 @@ fun getAdminSupaBase(): SupabaseClient {
         install(Auth)
         install(Postgrest)
     }
+}
 
+fun getGetProfileDetailsUseCase(): GetProfileDetailsUseCase {
+    return GetProfileDetailsUseCase(UserProfileRepositoryImp(UserProfileDao(getAdminSupaBase())))
 }

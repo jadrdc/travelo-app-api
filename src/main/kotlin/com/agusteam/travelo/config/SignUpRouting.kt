@@ -35,7 +35,7 @@ fun Application.configureSignUpFlowApi() {
         post("/confirmEmail") {
             val request = call.receive<ConfirmEmailModel>()
             val useCase = getSignUpUseCase()
-            val result = useCase.comfirmEmail(request)
+            val result = useCase.confirmEmail(request)
             when (result) {
                 is OperationResult.Error<*> -> call.respond(
                     HttpStatusCode.BadRequest,
