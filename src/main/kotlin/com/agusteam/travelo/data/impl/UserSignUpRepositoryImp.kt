@@ -19,7 +19,7 @@ class UserSignUpRepositoryImp(supabase: SupabaseClient) : UserSignUpRepository {
 
     override suspend fun resetPasswordForEmail(model: RequestPasswordChangeModel): OperationResult<Boolean> {
         return try {
-            val result = auth.resetPasswordForEmail(email = model.email)
+            auth.resetPasswordForEmail(email = model.email)
             OperationResult.Success(true)
         } catch (e: Exception) {
             OperationResult.Error(e)
@@ -28,7 +28,7 @@ class UserSignUpRepositoryImp(supabase: SupabaseClient) : UserSignUpRepository {
 
     override suspend fun login(model: LoginModel): OperationResult<LogonUserModel> {
         return try {
-            val userResponse = auth.signInWith(Email) {
+            auth.signInWith(Email) {
                 email = model.email
                 password = model.password
             }
