@@ -1,5 +1,6 @@
 package com.agusteam.travelo.config
 
+import com.agusteam.travelo.data.dao.UserProfileDao
 import com.agusteam.travelo.data.impl.UserSignUpRepositoryImp
 import com.agusteam.travelo.data.validations.FieldValidator
 import com.agusteam.travelo.domain.interfaces.UserSignUpRepository
@@ -35,9 +36,10 @@ val dInjectionModule = module {
             install(Postgrest)
         }
     }
-        single<FieldValidator> { FieldValidator() }
-        single<UserSignUpRepository> { UserSignUpRepositoryImp(get()) }
-        single<SignUpUserUseCase> { SignUpUserUseCase(get(), get()) }
+    single<FieldValidator> { FieldValidator() }
+    single<UserProfileDao> { UserProfileDao(get()) }
+    single<UserSignUpRepository> { UserSignUpRepositoryImp(get(), get()) }
+    single<SignUpUserUseCase> { SignUpUserUseCase(get(), get()) }
 
 
 }

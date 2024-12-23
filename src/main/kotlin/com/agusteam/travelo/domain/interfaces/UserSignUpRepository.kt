@@ -10,4 +10,5 @@ interface UserSignUpRepository {
     suspend fun signUpUser(model: UserSignupModel): OperationResult<Boolean>
     suspend fun login(model: LoginModel): OperationResult<LogonUserModel>
     suspend fun resetPasswordForEmail(model: RequestPasswordChangeModel): OperationResult<Boolean>
+    suspend fun comfirmEmail(userId: String): OperationResult<Boolean>
 }

@@ -1,6 +1,7 @@
 package com.agusteam.travelo.config
 
 import com.agusteam.travelo.data.core.OperationResult
+import com.agusteam.travelo.domain.models.ConfirmEmailModel
 import com.agusteam.travelo.domain.models.LoginModel
 import com.agusteam.travelo.domain.models.LogonUserModel
 import com.agusteam.travelo.domain.models.RequestPasswordChangeModel
@@ -27,6 +28,23 @@ fun Application.configureSignUpFlowApi() {
                 is OperationResult.Success<*> -> call.respond(
                     HttpStatusCode.OK,
                     "Request for  sending email sent: ${request.email}"
+                )
+
+            }
+        }
+        post("/confirmEmail") {
+            val request = call.receive<ConfirmEmailModel>()
+            val useCase = getSignUpUseCase()
+            val result = useCase.comfirmEmail(request)
+            when (result) {
+                is OperationResult.Error<*> -> call.respond(
+                    HttpStatusCode.BadRequest,
+                    result.exception.localizedMessage
+                )
+
+                is OperationResult.Success<*> -> call.respond(
+                    HttpStatusCode.OK,
+                    "Request for  sending email sent: ${request.userId}"
                 )
 
             }
