@@ -1,122 +1,76 @@
 package com.agusteam.travelo.config
 
-import com.agusteam.travelo.domain.models.Priority
-import com.agusteam.travelo.domain.models.TaskModel
-import com.agusteam.travelo.domain.models.TaskRepository
-import com.agusteam.travelo.domain.models.tasksAsTable
+import com.agusteam.travelo.data.core.OperationResult
+import com.agusteam.travelo.domain.models.LoginModel
+import com.agusteam.travelo.domain.models.LogonUserModel
+import com.agusteam.travelo.domain.models.RequestPasswordChangeModel
+import com.agusteam.travelo.domain.models.UserSignupModel
+import com.agusteam.travelo.getSignUpUseCase
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting() {
-    install(StatusPages) {
-        exception<IllegalStateException> { call, cause ->
-            call.respondText("App in illegal state as ${cause.message}")
-        }
-    }
-    install(ContentNegotiation) {
-        json()  // Use Kotlinx Serialization with JSON format
-    }
+fun Application.configureSignUpFlowApi() {
     routing {
-
-        route("/tasks") {
-            get("/lists") {
-                call.respond(
-                    listOf(
-                        TaskModel("cleaning", "Clean the house", Priority.Low),
-                        TaskModel("gardening", "Mow the lawn", Priority.Medium),
-                        TaskModel("shopping", "Buy the groceries", Priority.High),
-                        TaskModel("painting", "Paint the fence", Priority.Medium)
-                    )
-                )
-            }
-            get("/byName/{taskName}") {
-                val taskName = call.parameters["taskName"]
-                if (taskName.isNullOrBlank()) {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                } else {
-                    val task = TaskRepository.taskByName(taskName)
-                    if (task == null) {
-                        call.respond(HttpStatusCode.NotFound)
-                        return@get
-                    }
-
-                    call.respondText(
-                        contentType = ContentType.parse("text/html"),
-                        text = listOf(task).tasksAsTable()
-                    )
-                }
-
-            }
-
-            get {
-                val tasks = TaskRepository.allTasks()
-                call.respondText(
-                    contentType = ContentType.parse("text/html"),
-                    text = tasks.tasksAsTable()
-                )
-            }
-            get("/byPriority/{priority}") {
-                val priorityAsText = call.parameters["priority"]
-                if (priorityAsText == null) {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                }
-
-                try {
-                    val priority = Priority.valueOf(priorityAsText)
-                    val tasks = TaskRepository.tasksByPriority(priority)
-
-                    if (tasks.isEmpty()) {
-                        call.respond(HttpStatusCode.NotFound)
-                        return@get
-                    }
-
-                    call.respondText(
-                        contentType = ContentType.parse("text/html"),
-                        text = tasks.tasksAsTable()
-                    )
-                } catch (ex: IllegalArgumentException) {
-                    call.respond(HttpStatusCode.BadRequest)
-                }
-            }
-
-            post {
-                val formContent = call.receiveParameters()
-
-                val params = Triple(
-                    formContent["name"] ?: "",
-                    formContent["description"] ?: "",
-                    formContent["priority"] ?: ""
+        post("/resetPasswordForEmail") {
+            val request = call.receive<RequestPasswordChangeModel>()
+            val useCase = getSignUpUseCase()
+            val result = useCase.resetPasswordForEmail(request)
+            when (result) {
+                is OperationResult.Error<*> -> call.respond(
+                    HttpStatusCode.BadRequest,
+                    result.exception.localizedMessage
                 )
 
-                if (params.toList().any { it.isEmpty() }) {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@post
-                }
+                is OperationResult.Success<*> -> call.respond(
+                    HttpStatusCode.OK,
+                    "Request for  sending email sent: ${request.email}"
+                )
 
-                try {
-                    val priority = Priority.valueOf(params.third)
-                    TaskRepository.addTask(
-                        TaskModel(
-                            params.first,
-                            params.second,
-                            priority
-                        )
+            }
+        }
+
+        post("/login") {
+            try {
+                val request = call.receive<LoginModel>()
+                val useCase = getSignUpUseCase()
+                val result = useCase.login(request)
+                when (result) {
+                    is OperationResult.Error<*> -> call.respond(
+                        HttpStatusCode.BadRequest,
+                        result.exception.localizedMessage
                     )
 
-                    call.respond(HttpStatusCode.NoContent)
-                } catch (ex: IllegalArgumentException) {
-                    call.respond(HttpStatusCode.BadRequest)
-                } catch (ex: IllegalStateException) {
-                    call.respond(HttpStatusCode.BadRequest)
+                    is OperationResult.Success<*> -> call.respond(
+                        HttpStatusCode.OK, result.data as LogonUserModel
+                    )
+
                 }
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.BadRequest, "Error: ${e.message}")
+            }
+        }
+        post("/signup") {
+            try {
+                val request = call.receive<UserSignupModel>()
+                val useCase = getSignUpUseCase()
+                val result = useCase.signUpUser(request)
+                when (result) {
+                    is OperationResult.Error<*> -> call.respond(
+                        HttpStatusCode.BadRequest,
+                        result.exception.localizedMessage
+                    )
+
+                    is OperationResult.Success<*> -> call.respond(
+                        HttpStatusCode.OK,
+                        "User registered successfully: ${request.name}"
+                    )
+
+                }
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.BadRequest, "Error: ${e.message}")
             }
         }
 

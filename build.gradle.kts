@@ -19,18 +19,6 @@ repositories {
 }
 
 dependencies {
-    /*  implementation("io.ktor:ktor-server-core-jvm")
-    implementation("io.insert-koin:koin-ktor:3.5.6")
-    implementation("io.insert-koin:koin-logger-slf4j:3.5.6")
-    implementation("ch.qos.logback:logback-classic:1.4.14")
-
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.3"))
-      implementation("io.github.jan-tennert.supabase:postgrest-kt")
-      implementation("io.github.jan-tennert.supabase:auth-kt")
-      implementation("io.github.jan-tennert.supabase:realtime-kt")
-      implementation("io.ktor:ktor-client-cio:3.0.2")*/
-
-
     implementation(libs.jetbrains.kotlinx.serialization)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.content.negotiation)
@@ -47,4 +35,9 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:3.0.3")
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.github.jan-tennert.supabase:auth-kt")
+
+    implementation("io.insert-koin:koin-logger-slf4j:3.5.6")
+    implementation("ch.qos.logback:logback-classic:1.4.14")
+    implementation("io.insert-koin:koin-ktor:3.5.6")
+
 }
