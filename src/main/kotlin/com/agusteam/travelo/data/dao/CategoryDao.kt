@@ -8,12 +8,13 @@ import io.github.jan.supabase.postgrest.query.Columns
 class CategoryDao(supabase: SupabaseClient) {
     val db = supabase.postgrest
 
-    suspend fun getCategories(): kotlin.collections.List<CategoryModel> {
-        val categories= db.from("categories").select(columns = Columns.list("id", "descriptiob", "image", "is_active")) {
-            filter {
-                CategoryModel::is_active
-            }
-        }.decodeList<CategoryModel>()
+    suspend fun getCategories(): List<CategoryModel> {
+        val categories =
+            db.from("categories").select(columns = Columns.list("id", "description", "image", "is_active")) {
+                filter {
+                    CategoryModel::is_active
+                }
+            }.decodeList<CategoryModel>()
 
         return categories
     }
