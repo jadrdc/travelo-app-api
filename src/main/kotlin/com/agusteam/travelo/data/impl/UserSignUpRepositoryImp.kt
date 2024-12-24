@@ -9,8 +9,10 @@ import com.agusteam.travelo.domain.models.LogonUserModel
 import com.agusteam.travelo.domain.models.RequestPasswordChangeModel
 import com.agusteam.travelo.domain.models.UserSignupModel
 import com.agusteam.travelo.getAdminSupaBase
+import com.agusteam.travelo.getErrorMessage
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
 
 class UserSignUpRepositoryImp(
@@ -47,6 +49,7 @@ class UserSignUpRepositoryImp(
                 password = model.password
             }
             val currentUser = auth.currentUserOrNull()
+
             if (currentUser != null) {
                 val userProfile = userProfileDao.getUserProfile(currentUser.id)
                 if (userProfile == null) {
@@ -59,47 +62,43 @@ class UserSignUpRepositoryImp(
                             phone = userProfile.phone,
                             name = userProfile.name,
                             lastname = userProfile.lastname,
+                            isConfirmed = currentUser?.emailConfirmedAt != null
                         )
                     )
                 }
             } else {
                 OperationResult.Error(Exception("Usuario no encontrado"))
-
             }
-        } catch (e: Exception) {
-            OperationResult.Error(e)
+        } catch (auth: AuthRestException) {
+            val errorMessage = getErrorMessage(auth.error)
+            OperationResult.Error(Exception(errorMessage))
+        } catch (_: Exception) {
+            OperationResult.Error(Exception("No pudimos iniciar sesión. Verifica tus credenciales e inténtalo de nuevo."))
         }
     }
 
     override suspend fun signUpUser(model: UserSignupModel): OperationResult<Boolean> {
-        try {
-            val exists = userProfileDao.userExists(model.email)
-            if (exists) {
-                return OperationResult.Error(Exception("Usuario ya existe"))
+        return try {
+            val userResponse = auth.signUpWith(Email) {
+                email = model.email
+                password = model.password
+            }
+            if (userResponse == null) {
+                OperationResult.Error(Exception("Usuario no puede ser creado"))
             } else {
-                return createUser(model)
+                try {
+                    userProfileDao.insertUserProfile(model.toProfileDetails(userResponse.id))
+                    OperationResult.Success(true)
+                } catch (error: Exception) {
+                    rollbackUserSignup(userResponse.id)
+                    OperationResult.Error(error)
+                }
             }
+        } catch (auth: AuthRestException) {
+            val errorMessage = getErrorMessage(auth.error)
+            OperationResult.Error(Exception(errorMessage))
         } catch (e: Exception) {
-            return OperationResult.Error(e)
-        }
-
-    }
-
-    private suspend fun createUser(model: UserSignupModel): OperationResult<Boolean> {
-        val userResponse = auth.signUpWith(Email) {
-            email = model.email
-            password = model.password
-        }
-        if (userResponse == null) {
-            return OperationResult.Error(Exception("Usuario no puede ser creado"))
-        } else {
-            return try {
-                userProfileDao.insertUserProfile(model.toProfileDetails(userResponse.id))
-                OperationResult.Success(true)
-            } catch (error: Exception) {
-                rollbackUserSignup(userResponse.id)
-                OperationResult.Error(error)
-            }
+            OperationResult.Error(e)
         }
     }
 
