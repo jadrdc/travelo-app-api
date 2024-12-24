@@ -1,6 +1,8 @@
 package com.agusteam.travelo
 
+import com.agusteam.travelo.config.configureCategoryRouting
 import com.agusteam.travelo.config.configureDI
+import com.agusteam.travelo.config.configureProfileRouting
 import com.agusteam.travelo.config.configureSignUpFlowApi
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -24,5 +26,6 @@ fun Application.module() {
     }
     configureDI()
     configureSignUpFlowApi()
-
+    configureProfileRouting()
+    configureCategoryRouting()
 }

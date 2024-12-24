@@ -1,6 +1,8 @@
 package com.agusteam.travelo.config
 
 import com.agusteam.travelo.data.core.OperationResult
+import com.agusteam.travelo.domain.models.ConfirmEmailModel
+import com.agusteam.travelo.domain.models.ErrorResponse
 import com.agusteam.travelo.domain.models.LoginModel
 import com.agusteam.travelo.domain.models.LogonUserModel
 import com.agusteam.travelo.domain.models.RequestPasswordChangeModel
@@ -19,6 +21,30 @@ fun Application.configureSignUpFlowApi() {
             val useCase = getSignUpUseCase()
             val result = useCase.resetPasswordForEmail(request)
             when (result) {
+                is OperationResult.Error<*> -> {
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.BadRequest.value,
+                        error = "Bad Request",
+                        message = result.exception.localizedMessage ?: "An error occurred"
+                    )
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        errorResponse
+                    )
+                }
+
+                is OperationResult.Success<*> -> call.respond(
+                    HttpStatusCode.OK,
+                    "Request for  sending email sent: ${request.email}"
+                )
+
+            }
+        }
+        post("/confirmEmail") {
+            val request = call.receive<ConfirmEmailModel>()
+            val useCase = getSignUpUseCase()
+            val result = useCase.confirmEmail(request)
+            when (result) {
                 is OperationResult.Error<*> -> call.respond(
                     HttpStatusCode.BadRequest,
                     result.exception.localizedMessage
@@ -26,7 +52,7 @@ fun Application.configureSignUpFlowApi() {
 
                 is OperationResult.Success<*> -> call.respond(
                     HttpStatusCode.OK,
-                    "Request for  sending email sent: ${request.email}"
+                    "Request for  sending email sent: ${request.userId}"
                 )
 
             }
@@ -38,10 +64,17 @@ fun Application.configureSignUpFlowApi() {
                 val useCase = getSignUpUseCase()
                 val result = useCase.login(request)
                 when (result) {
-                    is OperationResult.Error<*> -> call.respond(
-                        HttpStatusCode.BadRequest,
-                        result.exception.localizedMessage
-                    )
+                    is OperationResult.Error<*> -> {
+                        val errorResponse = ErrorResponse(
+                            status = HttpStatusCode.BadRequest.value,
+                            error = "Bad Request",
+                            message = result.exception.localizedMessage ?: "An error occurred"
+                        )
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            errorResponse
+                        )
+                    }
 
                     is OperationResult.Success<*> -> call.respond(
                         HttpStatusCode.OK, result.data as LogonUserModel
@@ -58,10 +91,17 @@ fun Application.configureSignUpFlowApi() {
                 val useCase = getSignUpUseCase()
                 val result = useCase.signUpUser(request)
                 when (result) {
-                    is OperationResult.Error<*> -> call.respond(
-                        HttpStatusCode.BadRequest,
-                        result.exception.localizedMessage
-                    )
+                    is OperationResult.Error<*> -> {
+                        val errorResponse = ErrorResponse(
+                            status = HttpStatusCode.BadRequest.value,
+                            error = "Bad Request",
+                            message = result.exception.localizedMessage ?: "An error occurred"
+                        )
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            errorResponse
+                        )
+                    }
 
                     is OperationResult.Success<*> -> call.respond(
                         HttpStatusCode.OK,

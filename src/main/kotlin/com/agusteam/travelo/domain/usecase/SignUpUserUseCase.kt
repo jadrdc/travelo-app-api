@@ -3,6 +3,7 @@ package com.agusteam.travelo.domain.usecase
 import com.agusteam.travelo.data.core.OperationResult
 import com.agusteam.travelo.data.validations.FieldValidator
 import com.agusteam.travelo.domain.interfaces.UserSignUpRepository
+import com.agusteam.travelo.domain.models.ConfirmEmailModel
 import com.agusteam.travelo.domain.models.LoginModel
 import com.agusteam.travelo.domain.models.LogonUserModel
 import com.agusteam.travelo.domain.models.RequestPasswordChangeModel
@@ -13,6 +14,9 @@ class SignUpUserUseCase(
     val validator: FieldValidator
 ) {
 
+    suspend fun confirmEmail(model: ConfirmEmailModel): OperationResult<Boolean> {
+        return repository.comfirmEmail(model.userId)
+    }
     suspend fun login(model: LoginModel): OperationResult<LogonUserModel> {
         return repository.login(model)
     }
