@@ -48,7 +48,20 @@ class UserSignUpRepositoryImp(
             }
             val currentUser = auth.currentUserOrNull()
             if (currentUser != null) {
-                OperationResult.Success(LogonUserModel(id = currentUser.id, email = currentUser.email ?: " "))
+                val userProfile = userProfileDao.getUserProfile(currentUser.id)
+                if (userProfile == null) {
+                    OperationResult.Error(Exception("Usuario no encontrado"))
+                } else {
+                    OperationResult.Success(
+                        LogonUserModel(
+                            id = currentUser.id,
+                            email = userProfile.email,
+                            phone = userProfile.phone,
+                            name = userProfile.name,
+                            lastname = userProfile.lastname,
+                        )
+                    )
+                }
             } else {
                 OperationResult.Error(Exception("Usuario no encontrado"))
 

@@ -1,9 +1,13 @@
 package com.agusteam.travelo
 
+import com.agusteam.travelo.data.dao.CategoryDao
 import com.agusteam.travelo.data.dao.UserProfileDao
+import com.agusteam.travelo.data.impl.CategoryRepositoryImp
 import com.agusteam.travelo.data.impl.UserProfileRepositoryImp
 import com.agusteam.travelo.data.impl.UserSignUpRepositoryImp
 import com.agusteam.travelo.data.validations.FieldValidator
+import com.agusteam.travelo.domain.usecase.CreteBusinessProfileUseCase
+import com.agusteam.travelo.domain.usecase.GetCategoriesUseCase
 import com.agusteam.travelo.domain.usecase.GetProfileDetailsUseCase
 import com.agusteam.travelo.domain.usecase.SignUpUserUseCase
 import io.github.jan.supabase.SupabaseClient
@@ -38,4 +42,17 @@ fun getAdminSupaBase(): SupabaseClient {
 
 fun getGetProfileDetailsUseCase(): GetProfileDetailsUseCase {
     return GetProfileDetailsUseCase(UserProfileRepositoryImp(UserProfileDao(getAdminSupaBase())))
+}
+
+fun geBusinessProfileDetailsUseCase(): CreteBusinessProfileUseCase {
+    return CreteBusinessProfileUseCase(
+        FieldValidator(),
+        UserProfileRepositoryImp(
+            UserProfileDao(getAdminSupaBase())
+        )
+    )
+}
+
+fun getCategoriesUseCase(): GetCategoriesUseCase {
+    return GetCategoriesUseCase(CategoryRepositoryImp(CategoryDao(supabase = getAdminSupaBase())))
 }

@@ -1,5 +1,6 @@
 package com.agusteam.travelo
 
+import com.agusteam.travelo.config.configureCategoryRouting
 import com.agusteam.travelo.config.configureDI
 import com.agusteam.travelo.config.configureProfileRouting
 import com.agusteam.travelo.config.configureSignUpFlowApi
@@ -26,4 +27,5 @@ fun Application.module() {
     configureDI()
     configureSignUpFlowApi()
     configureProfileRouting()
+    configureCategoryRouting()
 }

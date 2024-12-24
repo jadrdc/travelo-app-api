@@ -1,6 +1,9 @@
 package com.agusteam.travelo.data.dao
 
+import com.agusteam.travelo.domain.models.BusinessProfileModel
+import com.agusteam.travelo.domain.models.CreateBusinessProfileModel
 import com.agusteam.travelo.domain.models.UserProfileDetailsModel
+import com.agusteam.travelo.domain.usecase.CreteBusinessProfileUseCase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
@@ -28,5 +31,28 @@ class UserProfileDao(supabase: SupabaseClient) {
                 UserProfileDetailsModel::id eq id
             }
         }.decodeSingleOrNull<UserProfileDetailsModel>()
+    }
+
+    suspend fun getBusinessProfile(id: String): BusinessProfileModel? {
+        return db.from("user_business").select(
+            columns = Columns.list(
+                "id",
+                "name",
+                "email",
+                "phone",
+                "description",
+                "address",
+                "rnc",
+                "creation_date"
+            )
+        ) {
+            filter {
+                BusinessProfileModel::id eq id
+            }
+        }.decodeSingleOrNull<BusinessProfileModel>()
+    }
+
+    suspend fun insertBusinessProfile(businessProfileModel: CreateBusinessProfileModel) {
+        db.from("user_business").insert(businessProfileModel)
     }
 }
