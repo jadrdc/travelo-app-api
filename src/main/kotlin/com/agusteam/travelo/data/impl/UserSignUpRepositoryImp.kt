@@ -62,7 +62,6 @@ class UserSignUpRepositoryImp(
                             phone = userProfile.phone,
                             name = userProfile.name,
                             lastname = userProfile.lastname,
-                            isConfirmed = currentUser?.emailConfirmedAt != null
                         )
                     )
                 }
@@ -78,6 +77,20 @@ class UserSignUpRepositoryImp(
     }
 
     override suspend fun signUpUser(model: UserSignupModel): OperationResult<Boolean> {
+        try {
+            val exists = userProfileDao.userExists(model.email)
+            return if (exists) {
+                OperationResult.Error(Exception("Usuario ya existe"))
+            } else {
+                createUser(model)
+            }
+        } catch (e: Exception) {
+            return OperationResult.Error(e)
+        }
+
+    }
+
+    suspend fun createUser(model: UserSignupModel): OperationResult<Boolean> {
         return try {
             val userResponse = auth.signUpWith(Email) {
                 email = model.email

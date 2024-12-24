@@ -91,10 +91,17 @@ fun Application.configureSignUpFlowApi() {
                 val useCase = getSignUpUseCase()
                 val result = useCase.signUpUser(request)
                 when (result) {
-                    is OperationResult.Error<*> -> call.respond(
-                        HttpStatusCode.BadRequest,
-                        result.exception.localizedMessage
-                    )
+                    is OperationResult.Error<*> -> {
+                        val errorResponse = ErrorResponse(
+                            status = HttpStatusCode.BadRequest.value,
+                            error = "Bad Request",
+                            message = result.exception.localizedMessage ?: "An error occurred"
+                        )
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            errorResponse
+                        )
+                    }
 
                     is OperationResult.Success<*> -> call.respond(
                         HttpStatusCode.OK,
