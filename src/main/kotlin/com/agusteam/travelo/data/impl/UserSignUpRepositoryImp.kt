@@ -49,7 +49,6 @@ class UserSignUpRepositoryImp(
                 password = model.password
             }
             val currentUser = auth.currentUserOrNull()
-
             if (currentUser != null) {
                 val userProfile = userProfileDao.getUserProfile(currentUser.id)
                 if (userProfile == null) {
@@ -67,6 +66,7 @@ class UserSignUpRepositoryImp(
                 }
             } else {
                 OperationResult.Error(Exception("Usuario no encontrado"))
+
             }
         } catch (auth: AuthRestException) {
             val errorMessage = getErrorMessage(auth.error)
@@ -79,10 +79,10 @@ class UserSignUpRepositoryImp(
     override suspend fun signUpUser(model: UserSignupModel): OperationResult<Boolean> {
         try {
             val exists = userProfileDao.userExists(model.email)
-            return if (exists) {
-                OperationResult.Error(Exception("Usuario ya existe"))
+            if (exists) {
+                return OperationResult.Error(Exception("Usuario ya existe"))
             } else {
-                createUser(model)
+                return createUser(model)
             }
         } catch (e: Exception) {
             return OperationResult.Error(e)
@@ -90,28 +90,21 @@ class UserSignUpRepositoryImp(
 
     }
 
-    suspend fun createUser(model: UserSignupModel): OperationResult<Boolean> {
-        return try {
-            val userResponse = auth.signUpWith(Email) {
-                email = model.email
-                password = model.password
+    private suspend fun createUser(model: UserSignupModel): OperationResult<Boolean> {
+        val userResponse = auth.signUpWith(Email) {
+            email = model.email
+            password = model.password
+        }
+        if (userResponse == null) {
+            return OperationResult.Error(Exception("Usuario no puede ser creado"))
+        } else {
+            return try {
+                userProfileDao.insertUserProfile(model.toProfileDetails(userResponse.id))
+                OperationResult.Success(true)
+            } catch (error: Exception) {
+                rollbackUserSignup(userResponse.id)
+                OperationResult.Error(error)
             }
-            if (userResponse == null) {
-                OperationResult.Error(Exception("Usuario no puede ser creado"))
-            } else {
-                try {
-                    userProfileDao.insertUserProfile(model.toProfileDetails(userResponse.id))
-                    OperationResult.Success(true)
-                } catch (error: Exception) {
-                    rollbackUserSignup(userResponse.id)
-                    OperationResult.Error(error)
-                }
-            }
-        } catch (auth: AuthRestException) {
-            val errorMessage = getErrorMessage(auth.error)
-            OperationResult.Error(Exception(errorMessage))
-        } catch (e: Exception) {
-            OperationResult.Error(e)
         }
     }
 
