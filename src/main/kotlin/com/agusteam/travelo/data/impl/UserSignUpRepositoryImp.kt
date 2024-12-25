@@ -48,30 +48,24 @@ class UserSignUpRepositoryImp(
                 email = model.email
                 password = model.password
             }
-            val currentUser = auth.currentUserOrNull()
-            if (currentUser != null) {
-                val userProfile = userProfileDao.getUserProfile(currentUser.id)
-                if (userProfile == null) {
-                    OperationResult.Error(Exception("Usuario no encontrado"))
-                } else {
-                    OperationResult.Success(
-                        LogonUserModel(
-                            id = currentUser.id,
-                            email = userProfile.email,
-                            phone = userProfile.phone,
-                            name = userProfile.name,
-                            lastname = userProfile.lastname,
-                        )
-                    )
-                }
-            } else {
-                OperationResult.Error(Exception("Usuario no encontrado"))
+            val currentUser =
+                auth.currentUserOrNull() ?: return OperationResult.Error(Exception("Usuario no encontrado"))
 
-            }
-        } catch (auth: AuthRestException) {
-            val errorMessage = getErrorMessage(auth.error)
-            OperationResult.Error(Exception(errorMessage))
-        } catch (_: Exception) {
+            val userProfile = userProfileDao.getUserProfile(currentUser.id)
+                ?: return OperationResult.Error(Exception("Usuario no encontrado"))
+
+            OperationResult.Success(
+                LogonUserModel(
+                    id = currentUser.id,
+                    email = userProfile.email,
+                    phone = userProfile.phone,
+                    name = userProfile.name,
+                    lastname = userProfile.lastname,
+                )
+            )
+        } catch (authException: AuthRestException) {
+            OperationResult.Error(Exception(getErrorMessage(authException.error)))
+        } catch (exception: Exception) {
             OperationResult.Error(Exception("No pudimos iniciar sesión. Verifica tus credenciales e inténtalo de nuevo."))
         }
     }
