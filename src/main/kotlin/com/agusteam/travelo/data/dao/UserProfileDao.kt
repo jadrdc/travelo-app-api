@@ -42,8 +42,7 @@ class UserProfileDao(supabase: SupabaseClient) {
                 "phone",
                 "description",
                 "address",
-                "rnc",
-                "creation_date"
+                "rnc", "image", "created_at"
             )
         ) {
             filter {

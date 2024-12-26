@@ -10,6 +10,7 @@ class CreteBusinessProfileUseCase(
     private val repository: UserProfileRepository
 ) {
     suspend operator fun invoke(model: CreateBusinessProfileModel): OperationResult<CreateBusinessProfileModel> {
+
         return try {
             val errors = validator.validateBusinessProfileModel(model)
             if (errors.isNotEmpty()) {

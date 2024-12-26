@@ -1,10 +1,9 @@
 package com.agusteam.travelo.domain.models
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BusinessProfileModel(
+data class TripProfileModel(
     val id: String,
     val name: String,
     val email: String,
@@ -13,5 +12,5 @@ data class BusinessProfileModel(
     val rnc: String,
     val description: String,
     val image: String,
-    val created_at:Instant
+    val month: Int
 )

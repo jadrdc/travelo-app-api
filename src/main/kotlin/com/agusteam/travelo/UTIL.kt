@@ -7,6 +7,7 @@ import com.agusteam.travelo.data.impl.UserProfileRepositoryImp
 import com.agusteam.travelo.data.impl.UserSignUpRepositoryImp
 import com.agusteam.travelo.data.validations.FieldValidator
 import com.agusteam.travelo.domain.usecase.CreteBusinessProfileUseCase
+import com.agusteam.travelo.domain.usecase.GetBusinessProfileUseCase
 import com.agusteam.travelo.domain.usecase.GetCategoriesUseCase
 import com.agusteam.travelo.domain.usecase.GetProfileDetailsUseCase
 import com.agusteam.travelo.domain.usecase.SignUpUserUseCase
@@ -14,6 +15,24 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.*
+
+
+fun calculateMonthsSince(createdAt: Instant): Int {
+    // Get the current time and the system's time zone
+    val currentDateTime = Clock.System.now()
+    val timeZone = TimeZone.currentSystemDefault()
+
+    // Convert Instant to LocalDate
+    val createdDate = createdAt.toLocalDateTime(timeZone).date
+    val currentDate = currentDateTime.toLocalDateTime(timeZone).date
+
+    // Calculate the difference in months
+    return createdDate.until(currentDate, DateTimeUnit.MONTH)
+}
+
 
 fun getSignUpUseCase(): SignUpUserUseCase {
     val supabase = createSupabaseClient(
@@ -47,6 +66,13 @@ fun getGetProfileDetailsUseCase(): GetProfileDetailsUseCase {
 fun geBusinessProfileDetailsUseCase(): CreteBusinessProfileUseCase {
     return CreteBusinessProfileUseCase(
         FieldValidator(),
+        UserProfileRepositoryImp(
+            UserProfileDao(getAdminSupaBase())
+        )
+    )
+}
+fun getGetBusinessProfileUseCase(): GetBusinessProfileUseCase {
+    return GetBusinessProfileUseCase(
         UserProfileRepositoryImp(
             UserProfileDao(getAdminSupaBase())
         )
