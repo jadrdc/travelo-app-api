@@ -1,14 +1,18 @@
 package com.agusteam.travelo
 
 import com.agusteam.travelo.data.dao.CategoryDao
+import com.agusteam.travelo.data.dao.TripsDao
 import com.agusteam.travelo.data.dao.UserProfileDao
 import com.agusteam.travelo.data.impl.CategoryRepositoryImp
+import com.agusteam.travelo.data.impl.TripRepositoryImp
 import com.agusteam.travelo.data.impl.UserProfileRepositoryImp
 import com.agusteam.travelo.data.impl.UserSignUpRepositoryImp
 import com.agusteam.travelo.data.validations.FieldValidator
+import com.agusteam.travelo.domain.usecase.CreateTripUseCase
 import com.agusteam.travelo.domain.usecase.CreteBusinessProfileUseCase
 import com.agusteam.travelo.domain.usecase.GetBusinessProfileUseCase
 import com.agusteam.travelo.domain.usecase.GetCategoriesUseCase
+import com.agusteam.travelo.domain.usecase.GetPaginatedTripUseCase
 import com.agusteam.travelo.domain.usecase.GetProfileDetailsUseCase
 import com.agusteam.travelo.domain.usecase.SignUpUserUseCase
 import io.github.jan.supabase.SupabaseClient
@@ -71,6 +75,7 @@ fun geBusinessProfileDetailsUseCase(): CreteBusinessProfileUseCase {
         )
     )
 }
+
 fun getGetBusinessProfileUseCase(): GetBusinessProfileUseCase {
     return GetBusinessProfileUseCase(
         UserProfileRepositoryImp(
@@ -81,6 +86,14 @@ fun getGetBusinessProfileUseCase(): GetBusinessProfileUseCase {
 
 fun getCategoriesUseCase(): GetCategoriesUseCase {
     return GetCategoriesUseCase(CategoryRepositoryImp(CategoryDao(supabase = getAdminSupaBase())))
+}
+
+
+fun getCreateTripUseCase(): CreateTripUseCase {
+    return CreateTripUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
+}
+fun getPaginatedTripUseCase(): GetPaginatedTripUseCase {
+    return GetPaginatedTripUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
 }
 
 fun getErrorMessage(errorCode: String): String {

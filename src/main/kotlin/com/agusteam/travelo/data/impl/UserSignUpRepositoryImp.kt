@@ -89,10 +89,10 @@ class UserSignUpRepositoryImp(
             email = model.email
             password = model.password
         }
-        if (userResponse == null) {
-            return OperationResult.Error(Exception("Usuario no puede ser creado"))
+        return if (userResponse == null) {
+            OperationResult.Error(Exception("Usuario no puede ser creado"))
         } else {
-            return try {
+            try {
                 userProfileDao.insertUserProfile(model.toProfileDetails(userResponse.id))
                 OperationResult.Success(true)
             } catch (error: Exception) {
