@@ -32,7 +32,7 @@ class UserProfileRepositoryImp(val dao: UserProfileDao) : UserProfileRepository 
         }
     }
 
-    override suspend fun getBusinessProfile(id: String): OperationResult<BusinessProfileModel> {
+    override suspend fun getBusinessProfile(id: String): OperationResult<List<BusinessProfileModel>> {
         return try {
             val result = dao.getBusinessProfile(id)
             if (result == null) {

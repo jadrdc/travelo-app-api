@@ -3,7 +3,6 @@ package com.agusteam.travelo.data.dao
 import com.agusteam.travelo.domain.models.BusinessProfileModel
 import com.agusteam.travelo.domain.models.CreateBusinessProfileModel
 import com.agusteam.travelo.domain.models.UserProfileDetailsModel
-import com.agusteam.travelo.domain.usecase.CreteBusinessProfileUseCase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
@@ -33,34 +32,20 @@ class UserProfileDao(supabase: SupabaseClient) {
         }.decodeSingleOrNull<UserProfileDetailsModel>()
     }
 
-    suspend fun getBusinessProfile(id: String): BusinessProfileModel? {
+    suspend fun getBusinessProfile(id: String): List<BusinessProfileModel> {
         val columns = Columns.raw(
-            """
-        id,
-        name,
-        email,
-        phone,
-        address,
-        rnc,
-        description,
-        image,
-        created_at,
-        user_business_category (
-            categories:category_id (
-                id,
-                description,
-                image
-            )
-        )
+            """ user_business_id, category_id,business:user_business(id,name,phone,email,description,rnc,image,address,created_at),
+      category:categories(id,description,image,is_active)
         """.trimIndent()
         )
-        return db.from("user_business").select(
+
+        return db.from("user_business_category").select(
             columns = columns
         ) {
             filter {
-                BusinessProfileModel::id eq id
+                BusinessProfileModel::user_business_id eq id
             }
-        }.decodeSingleOrNull<BusinessProfileModel>()
+        }.decodeList<BusinessProfileModel>()
     }
 
     suspend fun insertBusinessProfile(businessProfileModel: CreateBusinessProfileModel) {

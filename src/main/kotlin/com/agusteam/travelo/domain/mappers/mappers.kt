@@ -5,30 +5,27 @@ import com.agusteam.travelo.domain.models.BusinessProfileModel
 import com.agusteam.travelo.domain.models.TripProfileModel
 import com.agusteam.travelo.domain.models.UserProfileDetailsModel
 import com.agusteam.travelo.domain.models.UserSignupModel
-import kotlin.String
 
 
 fun UserSignupModel.toProfileDetails(id: String): UserProfileDetailsModel {
     return UserProfileDetailsModel(
-        id = id,
-        name = name,
-        email = email,
-        lastname = lastname,
-        phone = phone
+        id = id, name = name, email = email, lastname = lastname, phone = phone
     )
 }
 
-fun BusinessProfileModel.toDomain(): TripProfileModel {
+fun mapToTripProfileModel(list: List<BusinessProfileModel>): TripProfileModel {
+    val business = list.first().business
+
     return TripProfileModel(
-        id = id,
-        name = name,
-        email = email,
-        phone = phone,
-        address = address,
-        rnc = rnc,
-        description = description,
-        image = image,
-        month = calculateMonthsSince(created_at),
-        categories = user_business_categories.map { it.category }
-    )
+        id = business.id,
+        name = business.name,
+        email = business.email,
+        phone = business.phone,
+        address = business.address,
+        rnc = business.rnc,
+        description = business.description,
+        image = business.image,
+        month = calculateMonthsSince(business.created_at),
+        categories = list.map { it.category })
 }
+

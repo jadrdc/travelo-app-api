@@ -7,7 +7,7 @@ import com.agusteam.travelo.domain.models.BusinessProfileModel
 class GetBusinessProfileUseCase(
     private val repository: UserProfileRepository
 ) {
-    suspend operator fun invoke(id: String): OperationResult<BusinessProfileModel> {
+    suspend operator fun invoke(id: String): OperationResult<List<BusinessProfileModel>> {
         return try {
                  repository.getBusinessProfile(id)
         } catch (e: Exception) {

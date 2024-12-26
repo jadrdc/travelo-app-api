@@ -1,7 +1,7 @@
 package com.agusteam.travelo.config
 
 import com.agusteam.travelo.data.core.OperationResult
-import com.agusteam.travelo.domain.mappers.toDomain
+import com.agusteam.travelo.domain.mappers.mapToTripProfileModel
 import com.agusteam.travelo.domain.models.BusinessProfileModel
 import com.agusteam.travelo.domain.models.CreateBusinessProfileModel
 import com.agusteam.travelo.domain.models.GetBusinessProfileModel
@@ -61,9 +61,9 @@ fun Application.configureProfileRouting() {
                 )
 
                 is OperationResult.Success<*> -> {
-                    val trip = result.data as BusinessProfileModel
+                    val trip = result.data as List<BusinessProfileModel>
                     call.respond(
-                        HttpStatusCode.OK, trip.toDomain()
+                        HttpStatusCode.OK, mapToTripProfileModel(trip)
                     )
                 }
             }

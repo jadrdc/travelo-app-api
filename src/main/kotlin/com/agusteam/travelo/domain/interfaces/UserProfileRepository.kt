@@ -7,6 +7,6 @@ import com.agusteam.travelo.domain.models.UserProfileDetailsModel
 
 interface UserProfileRepository {
     suspend fun getUserProfile(id: String): OperationResult<UserProfileDetailsModel>
-    suspend fun getBusinessProfile(id: String): OperationResult<BusinessProfileModel>
+    suspend fun getBusinessProfile(id: String): OperationResult<List<BusinessProfileModel>>
     suspend fun createBusinessProfile(model: CreateBusinessProfileModel): OperationResult<CreateBusinessProfileModel>
 }
