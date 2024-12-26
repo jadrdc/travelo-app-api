@@ -13,5 +13,7 @@ data class BusinessProfileModel(
     val rnc: String,
     val description: String,
     val image: String,
-    val created_at:Instant
+    val created_at:Instant,
+    val user_business_categories: List<BusinessCategory> = listOf<BusinessCategory>()
+
 )

@@ -12,5 +12,6 @@ data class TripProfileModel(
     val rnc: String,
     val description: String,
     val image: String,
-    val month: Int
+    val month: Int,
+    val categories: List<CategoryModel> = listOf<CategoryModel>()
 )

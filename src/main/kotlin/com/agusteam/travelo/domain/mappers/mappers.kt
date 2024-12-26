@@ -19,7 +19,7 @@ fun UserSignupModel.toProfileDetails(id: String): UserProfileDetailsModel {
 }
 
 fun BusinessProfileModel.toDomain(): TripProfileModel {
-   return TripProfileModel(
+    return TripProfileModel(
         id = id,
         name = name,
         email = email,
@@ -28,6 +28,7 @@ fun BusinessProfileModel.toDomain(): TripProfileModel {
         rnc = rnc,
         description = description,
         image = image,
-        month = calculateMonthsSince(created_at)
+        month = calculateMonthsSince(created_at),
+        categories = user_business_categories.map { it.category }
     )
 }

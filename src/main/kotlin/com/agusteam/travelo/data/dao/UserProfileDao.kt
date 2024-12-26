@@ -34,16 +34,28 @@ class UserProfileDao(supabase: SupabaseClient) {
     }
 
     suspend fun getBusinessProfile(id: String): BusinessProfileModel? {
-        return db.from("user_business").select(
-            columns = Columns.list(
-                "id",
-                "name",
-                "email",
-                "phone",
-                "description",
-                "address",
-                "rnc", "image", "created_at"
+        val columns = Columns.raw(
+            """
+        id,
+        name,
+        email,
+        phone,
+        address,
+        rnc,
+        description,
+        image,
+        created_at,
+        user_business_category (
+            categories:category_id (
+                id,
+                description,
+                image
             )
+        )
+        """.trimIndent()
+        )
+        return db.from("user_business").select(
+            columns = columns
         ) {
             filter {
                 BusinessProfileModel::id eq id
