@@ -1,6 +1,7 @@
 package com.agusteam.travelo.data.dao
 
 import com.agusteam.travelo.domain.models.CreateTripModel
+import com.agusteam.travelo.domain.models.FavoriteTripModel
 import com.agusteam.travelo.domain.models.PaginatedTripModel
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
@@ -8,6 +9,10 @@ import io.github.jan.supabase.postgrest.query.Columns
 
 class TripsDao(supabase: SupabaseClient) {
     val db = supabase.postgrest
+
+    suspend fun setFavoriteTrip(model: FavoriteTripModel) {
+        db.from("favorite_trips").insert(model)
+    }
 
     suspend fun getTripsPagination(): List<PaginatedTripModel> {
         //TODO ADD FILTRO PARA CATEGORIS

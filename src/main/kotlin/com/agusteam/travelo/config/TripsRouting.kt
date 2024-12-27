@@ -4,11 +4,13 @@ import com.agusteam.travelo.data.core.OperationResult
 import com.agusteam.travelo.domain.models.CategoryModel
 import com.agusteam.travelo.domain.models.CreateTripModel
 import com.agusteam.travelo.domain.models.ErrorResponse
+import com.agusteam.travelo.domain.models.FavoriteTripModel
 import com.agusteam.travelo.domain.models.PaginatedTripModel
 import com.agusteam.travelo.domain.models.TripsModel
 import com.agusteam.travelo.getCategoriesUseCase
 import com.agusteam.travelo.getCreateTripUseCase
 import com.agusteam.travelo.getPaginatedTripUseCase
+import com.agusteam.travelo.getSetFavoriteTripUsecase
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.receive
@@ -42,6 +44,30 @@ fun Application.configureTripsRouting() {
                 }
             }
 
+        }
+        post("trip/favorite") {
+            val request = call.receive<FavoriteTripModel>()
+            val useCase = getSetFavoriteTripUsecase()
+            when (val result = useCase(request)
+            ) {
+                is OperationResult.Error<*> -> {
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.BadRequest.value,
+                        error = "Bad Request",
+                        message = result.exception.localizedMessage ?: "An error occurred"
+                    )
+                    call.respond(
+                        HttpStatusCode.BadRequest, errorResponse
+                    )
+                }
+
+
+                is OperationResult.Success<*> -> {
+                    call.respond(
+                        HttpStatusCode.OK
+                    )
+                }
+            }
         }
         get("/trips") {
             val request = call.receive<CreateTripModel>()

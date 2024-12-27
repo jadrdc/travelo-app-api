@@ -14,6 +14,7 @@ import com.agusteam.travelo.domain.usecase.GetBusinessProfileUseCase
 import com.agusteam.travelo.domain.usecase.GetCategoriesUseCase
 import com.agusteam.travelo.domain.usecase.GetPaginatedTripUseCase
 import com.agusteam.travelo.domain.usecase.GetProfileDetailsUseCase
+import com.agusteam.travelo.domain.usecase.SetTripFavoriteUseCase
 import com.agusteam.travelo.domain.usecase.SignUpUserUseCase
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
@@ -92,8 +93,13 @@ fun getCategoriesUseCase(): GetCategoriesUseCase {
 fun getCreateTripUseCase(): CreateTripUseCase {
     return CreateTripUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
 }
+
 fun getPaginatedTripUseCase(): GetPaginatedTripUseCase {
     return GetPaginatedTripUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
+}
+
+fun getSetFavoriteTripUsecase(): SetTripFavoriteUseCase {
+    return SetTripFavoriteUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
 }
 
 fun getErrorMessage(errorCode: String): String {
