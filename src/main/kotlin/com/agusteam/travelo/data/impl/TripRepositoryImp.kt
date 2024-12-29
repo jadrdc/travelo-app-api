@@ -6,6 +6,8 @@ import com.agusteam.travelo.domain.interfaces.TripRepository
 import com.agusteam.travelo.domain.models.CreateTripModel
 import com.agusteam.travelo.domain.models.FavoriteTripModel
 import com.agusteam.travelo.domain.models.PaginatedTripModel
+import com.agusteam.travelo.handleApiException
+import io.github.jan.supabase.exceptions.UnknownRestException
 
 class TripRepositoryImp(val dao: TripsDao) : TripRepository {
     override suspend fun createTrip(model: CreateTripModel): OperationResult<Boolean> {
@@ -17,14 +19,39 @@ class TripRepositoryImp(val dao: TripsDao) : TripRepository {
         }
     }
 
-   override suspend fun setFavoriteTrip(model: FavoriteTripModel): OperationResult<Boolean>{
+    override suspend fun getTripsIncludedServices(tripId: String): OperationResult<List<String>> {
+        return try {
+            val result = dao.getTripIncluded(tripId).map { it.description }
+            OperationResult.Success(result)
+        } catch (e: Exception) {
+            OperationResult.Error(e)
+        }
+    }
+
+    override suspend fun setFavoriteTrip(model: FavoriteTripModel): OperationResult<Boolean> {
         return try {
             val result = dao.setFavoriteTrip(model)
+            OperationResult.Success(true)
+        } catch (e: UnknownRestException) {
+            OperationResult.Error(
+                Exception(
+                    handleApiException(e)
+                )
+            )
+        } catch (e: Exception) {
+            OperationResult.Error(e)
+        }
+    }
+
+    override suspend fun removeFavorite(model: FavoriteTripModel): OperationResult<Boolean> {
+        return try {
+            val result = dao.removeFavorite(model)
             OperationResult.Success(true)
         } catch (e: Exception) {
             OperationResult.Error(e)
         }
     }
+
     override suspend fun getPaginatedTrips(): OperationResult<List<PaginatedTripModel>> {
         return try {
             val result = dao.getTripsPagination()

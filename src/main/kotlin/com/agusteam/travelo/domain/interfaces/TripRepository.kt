@@ -9,4 +9,6 @@ interface TripRepository {
     suspend fun setFavoriteTrip(model: FavoriteTripModel): OperationResult<Boolean>
     suspend fun createTrip(model: CreateTripModel): OperationResult<Boolean>
     suspend fun getPaginatedTrips(): OperationResult<List<PaginatedTripModel>>
+    suspend fun removeFavorite(model: FavoriteTripModel): OperationResult<Boolean>
+    suspend fun getTripsIncludedServices(tripId: String): OperationResult<List<String>>
 }

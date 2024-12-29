@@ -10,5 +10,5 @@ data class PaginatedTripModel(
     val destiny: String,
     val lat: Float,
     val lng: Float,
-    val businessModel: TripModel
+    val businessModel: TripModel,
 )

@@ -8,20 +8,12 @@ import com.agusteam.travelo.data.impl.TripRepositoryImp
 import com.agusteam.travelo.data.impl.UserProfileRepositoryImp
 import com.agusteam.travelo.data.impl.UserSignUpRepositoryImp
 import com.agusteam.travelo.data.validations.FieldValidator
-import com.agusteam.travelo.domain.usecase.CreateTripUseCase
-import com.agusteam.travelo.domain.usecase.CreteBusinessProfileUseCase
-import com.agusteam.travelo.domain.usecase.GetBusinessProfileUseCase
-import com.agusteam.travelo.domain.usecase.GetCategoriesUseCase
-import com.agusteam.travelo.domain.usecase.GetPaginatedTripUseCase
-import com.agusteam.travelo.domain.usecase.GetProfileDetailsUseCase
-import com.agusteam.travelo.domain.usecase.SetTripFavoriteUseCase
-import com.agusteam.travelo.domain.usecase.SignUpUserUseCase
+import com.agusteam.travelo.domain.usecase.*
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.postgrest.Postgrest
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
 import kotlinx.datetime.*
 
 
@@ -102,6 +94,14 @@ fun getSetFavoriteTripUsecase(): SetTripFavoriteUseCase {
     return SetTripFavoriteUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
 }
 
+fun getRemoveFavoriteTripUsecase(): RemoveTripFavoriteUseCase {
+    return RemoveTripFavoriteUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
+}
+
+fun getTripIncludeServicesUsecase(): GetTripIncludedServicesUseCase {
+    return GetTripIncludedServicesUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
+}
+
 fun getErrorMessage(errorCode: String): String {
     return when (errorCode) {
         "anonymous_provider_disabled" -> "Las autenticaciones anónimas están deshabilitadas."
@@ -165,5 +165,51 @@ fun getErrorMessage(errorCode: String): String {
         "saml_assertion_no_email" -> "La afirmación SAML recibida después del inicio de sesión no contiene una dirección de correo electrónico, lo cual es obligatorio."
         "saml_assertion_no_user_id" -> "La afirmación SAML no contiene un identificador de usuario válido."
         else -> "Error desconocido. Verifica los detalles del código de error."
+    }
+}
+
+// Define a sealed class for custom error handling
+sealed class RestError {
+    object BadRequest : RestError()
+    object Unauthorized : RestError()
+    object Forbidden : RestError()
+    object NotFound : RestError()
+    object Conflict : RestError()
+    object TooManyRequests : RestError()
+    object InternalServerError : RestError()
+    object ServiceUnavailable : RestError()
+    data class CustomError(val message: String) : RestError()
+    data class UnknownError(val exception: Exception) : RestError()
+}
+
+// Map error codes or exceptions to RestError
+fun mapToRestError(exception: UnknownRestException): RestError {
+    return when (exception.statusCode) {
+        400 -> RestError.BadRequest
+        401 -> RestError.Unauthorized
+        403 -> RestError.Forbidden
+        404 -> RestError.NotFound
+        409 -> RestError.Conflict
+        429 -> RestError.TooManyRequests
+        500 -> RestError.InternalServerError
+        503 -> RestError.ServiceUnavailable
+        else -> RestError.UnknownError(exception)
+    }
+}
+
+// Example usage
+fun handleApiException(exception: UnknownRestException): String {
+    val error = mapToRestError(exception)
+    return when (error) {
+        is RestError.BadRequest -> "Solicitud incorrecta: Verifica los datos enviados en la solicitud."
+        is RestError.Unauthorized -> "No autorizado: Revisa tu clave API o token de autenticación."
+        is RestError.Forbidden -> "Prohibido: No tienes permisos para acceder a este recurso."
+        is RestError.NotFound -> "No encontrado: El recurso solicitado no existe."
+        is RestError.Conflict -> "Conflicto: Hay un conflicto con el estado actual del recurso."
+        is RestError.TooManyRequests -> "Demasiadas solicitudes: Has excedido el límite de peticiones."
+        is RestError.InternalServerError -> "Error interno del servidor: Algo salió mal en el servidor."
+        is RestError.ServiceUnavailable -> "Servicio no disponible: Supabase podría estar en mantenimiento o sobrecargado."
+        is RestError.UnknownError -> "Error desconocido: ${error.exception.message}"
+        is RestError.CustomError -> "Error personalizado: ${error.message}"
     }
 }
