@@ -34,6 +34,7 @@ class TripsDao(supabase: SupabaseClient) {
         //TODO ADD FILTRO PARA CATEGORIS
         //TODO ADD PAGINATION 10
         // ADD FILTER PARA FECHA
+
         val columns = Columns.raw(
             """id, 
        name, 
@@ -41,7 +42,7 @@ class TripsDao(supabase: SupabaseClient) {
        destiny, 
        lat, 
        lng, 
-       businessModel:user_business(id,name,phone,email,description,rnc,image,address,created_at)"""
+       businessModel:user_business(id,name,phone,email,description,rnc,image,address,created_at),images,cancellation_policy"""
         )
 
         return db.from("trips").select(columns = columns) {

@@ -11,4 +11,6 @@ data class PaginatedTripModel(
     val lat: Float,
     val lng: Float,
     val businessModel: TripModel,
+    val images: List<String>,
+    val cancellation_policy: String
 )
