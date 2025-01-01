@@ -26,7 +26,7 @@ class TripsDao(supabase: SupabaseClient) {
        description,
        destiny,
        lat,
-       lng,images,cancellation_policy)"""
+       lng,images,cancellation_policy, businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at) )"""
         )
 
         return db.from("trip_scheduled").select(columns = columns) {

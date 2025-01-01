@@ -12,4 +12,5 @@ data class TripsModel(
     val lng: Float,
     val images: List<String>,
     val cancellation_policy: String,
+    val businessModel: BusinessProviderTripModel,
 )
