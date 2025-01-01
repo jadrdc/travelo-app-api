@@ -13,8 +13,9 @@ import io.ktor.server.routing.*
 fun Application.configureTripsRouting() {
     routing {
 
+
         get("/trip/availables") {
-            val useCase = GetPaginatedTripDetailUseCase()
+            val useCase = getPaginatedTripDetailUseCase()
 
             when (val result = useCase()) {
 
@@ -114,6 +115,32 @@ fun Application.configureTripsRouting() {
                     )
                 }
             }
+        }
+        get("trip/favorite/{userId}") {
+            val tripId = call.parameters["userId"] ?: ""
+            val useCase = getGetFavoriteTripsUseCase()
+            when (val result = useCase(tripId)) {
+
+                is OperationResult.Success<*> -> {
+                    val trips = result.data as List<PaginatedFavoriteTripModel>
+                    call.respond(
+                        HttpStatusCode.OK, trips
+
+                    )
+                }
+
+                is OperationResult.Error<*> -> {
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.BadRequest.value,
+                        error = "Bad Request",
+                        message = result.exception.localizedMessage ?: "An error occurred"
+                    )
+                    call.respond(
+                        HttpStatusCode.BadRequest, errorResponse
+                    )
+                }
+            }
+
         }
         post("trip/favorite") {
             val request = call.receive<FavoriteTripModel>()

@@ -2,13 +2,11 @@ package com.agusteam.travelo.config
 
 import com.agusteam.travelo.data.core.OperationResult
 import com.agusteam.travelo.domain.mappers.mapToTripProfileModel
-import com.agusteam.travelo.domain.models.BusinessProfileModel
-import com.agusteam.travelo.domain.models.CreateBusinessProfileModel
-import com.agusteam.travelo.domain.models.GetBusinessProfileModel
-import com.agusteam.travelo.domain.models.UserProfileDetailsModel
+import com.agusteam.travelo.domain.models.*
 import com.agusteam.travelo.geBusinessProfileDetailsUseCase
 import com.agusteam.travelo.getGetBusinessProfileUseCase
 import com.agusteam.travelo.getGetProfileDetailsUseCase
+import com.agusteam.travelo.getGetUpcomingTripsByModelUseCase
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -17,6 +15,31 @@ import io.ktor.server.routing.*
 
 fun Application.configureProfileRouting() {
     routing {
+
+        get("/getBusinessUpcomingTrips/{id}") {
+            val request = call.parameters["id"] ?: ""
+            val useCase = getGetUpcomingTripsByModelUseCase()
+            when (val result = useCase(request)) {
+                is OperationResult.Error<*> -> {
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.BadRequest.value,
+                        error = "Bad Request",
+                        message = result.exception.localizedMessage ?: "An error occurred"
+                    )
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        errorResponse
+                    )
+                }
+
+                is OperationResult.Success<*> -> {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        result.data as List<UpcomingTripModelListResponse>
+                    )
+                }
+            }
+        }
         get("/profile/{id}") {
             val request = call.parameters["id"] ?: ""
             val useCase = getGetProfileDetailsUseCase()

@@ -102,8 +102,15 @@ fun getTripIncludeServicesUsecase(): GetTripIncludedServicesUseCase {
     return GetTripIncludedServicesUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
 }
 
-fun GetPaginatedTripDetailUseCase(): GetPaginatedTripDetailUseCase {
+fun getPaginatedTripDetailUseCase(): GetPaginatedTripDetailUseCase {
     return GetPaginatedTripDetailUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
+}
+
+fun getGetUpcomingTripsByModelUseCase(): GetUpcomingTripsByModelUseCase {
+    return GetUpcomingTripsByModelUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
+}
+fun getGetFavoriteTripsUseCase(): GetFavoriteTripsUseCase {
+    return GetFavoriteTripsUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
 }
 
 fun getErrorMessage(errorCode: String): String {

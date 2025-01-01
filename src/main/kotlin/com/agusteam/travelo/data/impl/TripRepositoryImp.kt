@@ -3,10 +3,7 @@ package com.agusteam.travelo.data.impl
 import com.agusteam.travelo.data.core.OperationResult
 import com.agusteam.travelo.data.dao.TripsDao
 import com.agusteam.travelo.domain.interfaces.TripRepository
-import com.agusteam.travelo.domain.models.CreateTripModel
-import com.agusteam.travelo.domain.models.FavoriteTripModel
-import com.agusteam.travelo.domain.models.PaginatedTripModel
-import com.agusteam.travelo.domain.models.TripScheduleModel
+import com.agusteam.travelo.domain.models.*
 import com.agusteam.travelo.handleApiException
 import io.github.jan.supabase.exceptions.UnknownRestException
 
@@ -15,6 +12,24 @@ class TripRepositoryImp(val dao: TripsDao) : TripRepository {
         return try {
             val result = dao.insertTrip(model)
             OperationResult.Success(true)
+        } catch (e: Exception) {
+            OperationResult.Error(e)
+        }
+    }
+
+    override suspend fun getUpcomingTrips(providerId: String): OperationResult<List<UpcomingTripModelListResponse>> {
+        return try {
+            val result = dao.getUpcomingTrips(providerId)
+            OperationResult.Success(result)
+        } catch (e: Exception) {
+            OperationResult.Error(e)
+        }
+    }
+
+    override suspend fun getFavoriteTripList(userId: String): OperationResult<List<PaginatedFavoriteTripModel>> {
+        return try {
+            val result = dao.getFavoriteTripList(userId)
+            OperationResult.Success(result)
         } catch (e: Exception) {
             OperationResult.Error(e)
         }

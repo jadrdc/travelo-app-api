@@ -31,8 +31,8 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
 
     implementation("com.google.firebase:firebase-admin:9.2.0")
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.3"))
     implementation("io.ktor:ktor-client-cio:3.0.3")
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.3"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.github.jan-tennert.supabase:auth-kt")
 

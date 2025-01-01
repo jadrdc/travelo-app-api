@@ -4,14 +4,66 @@ import com.agusteam.travelo.domain.models.*
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
+
 
 class TripsDao(supabase: SupabaseClient) {
     val db = supabase.postgrest
+
+
+    suspend fun getFavoriteTripList(userId: String): List<PaginatedFavoriteTripModel> {
+        val columns = Columns.raw(
+            """
+         tripModel:trip_id(id,
+                          name,
+                           lat,
+                           lng,
+                           cancellation_policy,
+                           description,
+                          destiny,
+                          images, 
+                          business_id,
+                          businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at) )
+        """
+        )
+        return db.from("favorite_trips").select(columns).decodeList<PaginatedFavoriteTripModel>()
+
+    }
+
+    suspend fun getUpcomingTrips(businessId: String): List<UpcomingTripModelListResponse> {
+        val columns = Columns.raw(
+            """ 
+           is_active,
+           leaving_time,
+           returning_time,
+           total_payment,
+         tripModel:trip_id(id,
+                          name,
+                          destiny,
+                          images, 
+                          business_id,
+                          businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at) )
+        """
+        )
+
+        val result = db.from("trip_scheduled").select(columns = columns) {
+            limit(5)
+            filter { UpcomingTripModelListResponse::is_active eq true }
+            filter {
+                eq("trip_id.business_id", businessId) // Filter based on the business_id in tripModel
+            }
+            order(column = "leaving_time", order = Order.ASCENDING)
+
+        }.decodeList<UpcomingTripModelListResponse>().filter { it.tripModel != null }
+
+        return result
+    }
+
+
     suspend fun getActiveTrips(): List<TripScheduleModel> {
         //businessModel:user_business(id,name,phone,email,description,rnc,image,address,created_at),
         val columns = Columns.raw(
@@ -29,8 +81,7 @@ class TripsDao(supabase: SupabaseClient) {
        lng,images,cancellation_policy, businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at) )"""
         )
 
-        return db.from("trip_scheduled").select(columns = columns) {
-        }.decodeList<TripScheduleModel>()
+        return db.from("trip_scheduled").select(columns = columns).decodeList<TripScheduleModel>()
     }
 
     suspend fun setFavoriteTrip(model: FavoriteTripModel) {
@@ -54,10 +105,10 @@ class TripsDao(supabase: SupabaseClient) {
 
     suspend fun doesFavoriteTripExist(userId: String, tripId: String): String {
         val result = db.rpc("is_trip_favorite", parameters = buildJsonObject {
-            put("userid", userId)
-            put(
-                "tripid", tripId
-            )
+            /*  put("userid", userId)
+              put(
+                  "tripid", tripId
+              )*/
         })
         return result.data
     }
@@ -87,25 +138,9 @@ class TripsDao(supabase: SupabaseClient) {
         }
     }
 
-    suspend fun getTripsPagination2(): List<PaginatedTripModel> {
-        //TODO ADD FILTRO PARA CATEGORIS
-        //TODO ADD PAGINATION 10
-        // ADD FILTER PARA FECHA
-        val columns = Columns.raw(
-            """id, 
-       name, 
-       description, 
-       destiny, 
-       lat, 
-       lng, 
-       businessModel:user_business(id,name,phone,email,description,rnc,image,address,created_at),images,cancellation_policy"""
-        )
-
-        return db.from("trips").select(columns = columns) {
-        }.decodeList<PaginatedTripModel>()
-    }
 
     suspend fun insertTrip(model: CreateTripModel) {
         db.from("trips").insert(model)
     }
+
 }

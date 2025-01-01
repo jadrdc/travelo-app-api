@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BusinessProviderTripModel(
-    val id: String, val name: String,
+    val id: String,
+    val name: String,
     val image: String,
     val created_at: Instant,
     val month: Int = calculateMonthsSince(created_at)
