@@ -18,4 +18,15 @@ class CategoryDao(supabase: SupabaseClient) {
 
         return categories
     }
+
+    suspend fun getCategoriesByProvider(providerId: String): List<CategoryModel> {
+        val categories =
+            db.from("categories").select(columns = Columns.list("id", "description", "image", "is_active")) {
+                filter {
+                    CategoryModel::is_active
+                }
+            }.decodeList<CategoryModel>()
+
+        return categories
+    }
 }

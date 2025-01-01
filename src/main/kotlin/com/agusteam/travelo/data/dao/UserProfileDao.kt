@@ -3,12 +3,30 @@ package com.agusteam.travelo.data.dao
 import com.agusteam.travelo.domain.models.BusinessProfileModel
 import com.agusteam.travelo.domain.models.CreateBusinessProfileModel
 import com.agusteam.travelo.domain.models.UserProfileDetailsModel
+import com.agusteam.travelo.models.TripsID
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Count
 
 class UserProfileDao(supabase: SupabaseClient) {
     val db = supabase.postgrest
+
+    suspend fun getTripCount(providerId: String) {
+        val result = db.from("trips").select(columns = Columns.raw(  """
+            id, 
+        name, 
+        description, 
+        destiny, 
+        lat, 
+        lng""")).decodeList<TripsID>()
+
+        val count2 = db.from("trips")
+            .select {
+                count(Count.EXACT)
+            }.countOrNull()
+     val count = count2
+    }
 
     suspend fun userExists(email: String): Boolean {
         val result = db.from("user_profile").select {
@@ -25,6 +43,7 @@ class UserProfileDao(supabase: SupabaseClient) {
     }
 
     suspend fun getUserProfile(id: String): UserProfileDetailsModel? {
+
         return db.from("user_profile").select(columns = Columns.list("id", "name", "email", "phone", "lastname")) {
             filter {
                 UserProfileDetailsModel::id eq id
@@ -39,13 +58,18 @@ class UserProfileDao(supabase: SupabaseClient) {
         """.trimIndent()
         )
 
-        return db.from("user_business_category").select(
+        val results = db.from("user_business_category").select(
             columns = columns
         ) {
             filter {
                 BusinessProfileModel::user_business_id eq id
             }
         }.decodeList<BusinessProfileModel>()
+        val tripCount = getTripCount(id)
+        return results.map {
+            it.copy(tripOffers = 0)
+
+        }
     }
 
     suspend fun insertBusinessProfile(businessProfileModel: CreateBusinessProfileModel) {

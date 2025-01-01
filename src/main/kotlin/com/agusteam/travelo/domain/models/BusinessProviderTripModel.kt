@@ -5,7 +5,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TripModel(
+data class BusinessProviderTripModel(
     val id: String, val name: String,
     val image: String,
     val created_at: Instant,

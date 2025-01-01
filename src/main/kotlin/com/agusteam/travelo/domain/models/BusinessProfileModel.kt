@@ -7,6 +7,7 @@ data class BusinessProfileModel(
     val user_business_id: String,
     val category_id: String,
     val business: BusinessModel,
-    val category: CategoryModel
+    val category: CategoryModel,
+    val tripOffers: Int = 0
 
 )

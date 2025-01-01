@@ -10,7 +10,8 @@ data class PaginatedTripModel(
     val destiny: String,
     val lat: Float,
     val lng: Float,
-    val businessModel: TripModel,
+    val businessModel: BusinessProviderTripModel,
     val images: List<String>,
-    val cancellation_policy: String
+    val cancellation_policy: String,
+    val isFavorite: String = ""
 )

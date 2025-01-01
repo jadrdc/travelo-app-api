@@ -25,6 +25,7 @@ fun mapToTripProfileModel(list: List<BusinessProfileModel>): TripProfileModel {
         rnc = business.rnc,
         description = business.description,
         image = business.image,
+        tripOffers = list.first().tripOffers,
         month = calculateMonthsSince(business.created_at),
         categories = list.map { it.category })
 }

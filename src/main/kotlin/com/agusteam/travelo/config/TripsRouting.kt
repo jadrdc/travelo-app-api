@@ -1,15 +1,8 @@
 package com.agusteam.travelo.config
 
+import com.agusteam.travelo.*
 import com.agusteam.travelo.data.core.OperationResult
-import com.agusteam.travelo.domain.models.CreateTripModel
-import com.agusteam.travelo.domain.models.ErrorResponse
-import com.agusteam.travelo.domain.models.FavoriteTripModel
-import com.agusteam.travelo.domain.models.PaginatedTripModel
-import com.agusteam.travelo.getCreateTripUseCase
-import com.agusteam.travelo.getPaginatedTripUseCase
-import com.agusteam.travelo.getRemoveFavoriteTripUsecase
-import com.agusteam.travelo.getSetFavoriteTripUsecase
-import com.agusteam.travelo.getTripIncludeServicesUsecase
+import com.agusteam.travelo.domain.models.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -19,6 +12,32 @@ import io.ktor.server.routing.*
 
 fun Application.configureTripsRouting() {
     routing {
+
+        get("/trip/availables") {
+            val useCase = GetPaginatedTripDetailUseCase()
+
+            when (val result = useCase()) {
+
+                is OperationResult.Success<*> -> {
+                    call.respond(
+                        HttpStatusCode.OK, result.data as List<TripScheduleModel>
+                    )
+                }
+
+                is OperationResult.Error<*> -> {
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.BadRequest.value,
+                        error = "Bad Request",
+                        message = result.exception.localizedMessage ?: "An error occurred"
+                    )
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        errorResponse
+                    )
+                }
+            }
+
+        }
         get("/trip/included/{trip}") {
             val tripId = call.parameters["trip"] ?: ""
             val useCase = getTripIncludeServicesUsecase()

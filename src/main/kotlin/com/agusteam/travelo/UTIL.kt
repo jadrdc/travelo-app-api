@@ -102,6 +102,10 @@ fun getTripIncludeServicesUsecase(): GetTripIncludedServicesUseCase {
     return GetTripIncludedServicesUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
 }
 
+fun GetPaginatedTripDetailUseCase(): GetPaginatedTripDetailUseCase {
+    return GetPaginatedTripDetailUseCase(TripRepositoryImp(TripsDao(getAdminSupaBase())))
+}
+
 fun getErrorMessage(errorCode: String): String {
     return when (errorCode) {
         "anonymous_provider_disabled" -> "Las autenticaciones anónimas están deshabilitadas."
