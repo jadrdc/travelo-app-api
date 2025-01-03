@@ -30,7 +30,14 @@ class TripsDao(supabase: SupabaseClient) {
                           businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at) )
         """
         )
-        return db.from("favorite_trips").select(columns).decodeList<PaginatedFavoriteTripModel>()
+        return db.from("favorite_trips").select(columns) {
+            filter {
+                eq(
+                    "user_id",
+                    userId
+                )
+            }
+        }.decodeList<PaginatedFavoriteTripModel>()
 
     }
 
@@ -64,7 +71,7 @@ class TripsDao(supabase: SupabaseClient) {
     }
 
 
-    suspend fun getActiveTrips(): List<TripScheduleModel> {
+    suspend fun getActiveTrips(requestModel: TripAvailablePaginationRequestModel? = null): List<TripScheduleModel> {
         //businessModel:user_business(id,name,phone,email,description,rnc,image,address,created_at),
         val columns = Columns.raw(
             """ 
@@ -81,7 +88,22 @@ class TripsDao(supabase: SupabaseClient) {
        lng,images,cancellation_policy, businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at) )"""
         )
 
-        return db.from("trip_scheduled").select(columns = columns).decodeList<TripScheduleModel>()
+        return db.from("trip_scheduled").select(columns = columns) {
+            if (requestModel != null) {
+                if (requestModel.startingAmount > 0.0) {
+                    filter {
+                        gte("total_payment", requestModel.startingAmount)
+                    }
+                }
+                if (requestModel.endingAmount > 0.0) {
+                    filter {
+                        lte("total_payment", requestModel.endingAmount)
+                    }
+                }
+            }
+            filter { eq("is_active", true) }
+            order(column = "leaving_time", order = Order.ASCENDING)
+        }.decodeList<TripScheduleModel>()
     }
 
     suspend fun setFavoriteTrip(model: FavoriteTripModel) {

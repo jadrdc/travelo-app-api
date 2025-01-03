@@ -35,9 +35,9 @@ class TripRepositoryImp(val dao: TripsDao) : TripRepository {
         }
     }
 
-    override suspend fun getActiveTrips(): OperationResult<List<TripScheduleModel>> {
+    override suspend fun getActiveTrips(req: TripAvailablePaginationRequestModel?): OperationResult<List<TripScheduleModel>> {
         return try {
-            val result = dao.getActiveTrips()
+            val result = dao.getActiveTrips(req)
             OperationResult.Success(result)
         } catch (e: Exception) {
             OperationResult.Error(e)

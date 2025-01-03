@@ -15,6 +15,7 @@ fun Application.configureTripsRouting() {
 
 
         get("/trip/availables") {
+            //    val req = call.receive<TripAvailablePaginationRequestModel>()
             val useCase = getPaginatedTripDetailUseCase()
 
             when (val result = useCase()) {

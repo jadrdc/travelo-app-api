@@ -9,7 +9,7 @@ interface TripRepository {
     suspend fun getPaginatedTrips(): OperationResult<List<PaginatedTripModel>>
     suspend fun removeFavorite(model: FavoriteTripModel): OperationResult<Boolean>
     suspend fun getTripsIncludedServices(tripId: String): OperationResult<List<String>>
-    suspend fun getActiveTrips(): OperationResult<List<TripScheduleModel>>
+    suspend fun getActiveTrips(req: TripAvailablePaginationRequestModel?=null): OperationResult<List<TripScheduleModel>>
     suspend fun getUpcomingTrips(providerId: String): OperationResult<List<UpcomingTripModelListResponse>>
     suspend fun getFavoriteTripList(userId: String): OperationResult<List<PaginatedFavoriteTripModel>>
 }
