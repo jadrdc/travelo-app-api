@@ -3,7 +3,7 @@ package com.agusteam.travelo.domain.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TripsModel(
+data class PaginatedTripCategoryModel(
     val id: String,
     val name: String,
     val description: String,
@@ -13,6 +13,5 @@ data class TripsModel(
     val images: List<String>,
     val cancellation_policy: String,
     val businessModel: BusinessProviderTripModel,
-    val scheduledModel: List<TripDetails> = listOf()
+    val details: TripDetails,
 )
-

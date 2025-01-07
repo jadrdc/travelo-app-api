@@ -71,28 +71,32 @@ class TripsDao(supabase: SupabaseClient) {
     }
 
 
-    suspend fun getActiveTrips(requestModel: TripAvailablePaginationRequestModel? = null): List<TripScheduleModel> {
-        //businessModel:user_business(id,name,phone,email,description,rnc,image,address,created_at),
+    suspend fun getActiveTrips(requestModel: TripAvailablePaginationRequestModel): List<PaginatedTripCategoryModel> {
         val columns = Columns.raw(
             """ 
-           leaving_time,
-           returning_time,
-        total_payment,
-        initial_payment,
-        meeting_point,
         tripModel:trip_id(id,
        name,
        description,
        destiny,
        lat,
-       lng,images,cancellation_policy, businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at) )"""
+       lng,images,cancellation_policy, businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at),
+            scheduledModel:trip_scheduled(
+                leaving_time,
+                returning_time,
+                total_payment,
+                initial_payment,
+                meeting_point
+            ) )"""
         )
-
-        return db.from("trip_scheduled")
-            .select(columns = columns) {
-            filter { eq("is_active", true) }
-            order(column = "leaving_time", order = Order.ASCENDING)
-        }.decodeList<TripScheduleModel>()
+        val response = db.from("trips_categories").select(columns = columns) {
+            filter {
+                eq("category_id", requestModel.category)
+                eq("trip_id.trip_scheduled.is_active", true)
+            }
+        }
+        val result = response.decodeList<TripScheduleModel>().filter { it.tripModel.scheduledModel.isNotEmpty() }
+            .flatMap { it.toPaginatedTripCategoryModel() }.sortedBy { it.details.leaving_time }
+        return result
     }
 
     suspend fun setFavoriteTrip(model: FavoriteTripModel) {
