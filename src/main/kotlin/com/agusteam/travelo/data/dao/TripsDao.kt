@@ -88,19 +88,8 @@ class TripsDao(supabase: SupabaseClient) {
        lng,images,cancellation_policy, businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at) )"""
         )
 
-        return db.from("trip_scheduled").select(columns = columns) {
-            if (requestModel != null) {
-                if (requestModel.startingAmount > 0.0) {
-                    filter {
-                        gte("total_payment", requestModel.startingAmount)
-                    }
-                }
-                if (requestModel.endingAmount > 0.0) {
-                    filter {
-                        lte("total_payment", requestModel.endingAmount)
-                    }
-                }
-            }
+        return db.from("trip_scheduled")
+            .select(columns = columns) {
             filter { eq("is_active", true) }
             order(column = "leaving_time", order = Order.ASCENDING)
         }.decodeList<TripScheduleModel>()

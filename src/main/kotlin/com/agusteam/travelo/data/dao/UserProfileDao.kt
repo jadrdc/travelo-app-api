@@ -13,19 +13,23 @@ class UserProfileDao(supabase: SupabaseClient) {
     val db = supabase.postgrest
 
     suspend fun getTripCount(providerId: String) {
-        val result = db.from("trips").select(columns = Columns.raw(  """
+        val result = db.from("trips").select(
+            columns = Columns.raw(
+                """
             id, 
         name, 
         description, 
         destiny, 
         lat, 
-        lng""")).decodeList<TripsID>()
+        lng"""
+            )
+        ).decodeList<TripsID>()
 
         val count2 = db.from("trips")
             .select {
                 count(Count.EXACT)
             }.countOrNull()
-     val count = count2
+        val count = count2
     }
 
     suspend fun userExists(email: String): Boolean {
