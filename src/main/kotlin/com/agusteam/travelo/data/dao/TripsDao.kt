@@ -9,6 +9,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.buildJsonObject
+import java.util.*
 
 
 class TripsDao(supabase: SupabaseClient) {
@@ -97,9 +98,20 @@ class TripsDao(supabase: SupabaseClient) {
                 eq("trip_id.trip_scheduled.is_active", true)
             }
         }
-        val result = response.decodeList<TripScheduleModel>().filter { it.tripModel.scheduledModel.isNotEmpty() }
+        val result = response.decodeList<TripScheduleModel>().filter { true }
+            .filter { it.tripModel?.scheduledModel?.isNotEmpty() == true }
             .flatMap { it.toPaginatedTripCategoryModel() }.sortedBy { it.details.leaving_time }
-        return result
+        return if (!requestModel.search.isNullOrBlank()) {
+            result.filter {
+                it.name.lowercase(Locale.getDefault())
+                    .contains(requestModel.search.lowercase(Locale.getDefault()))
+            }
+
+        } else {
+            result
+        }
+
+
     }
 
     suspend fun setFavoriteTrip(model: FavoriteTripModel) {

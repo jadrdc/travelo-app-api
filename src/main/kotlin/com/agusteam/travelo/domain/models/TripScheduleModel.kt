@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TripScheduleModel(
-    val tripModel: TripsModel
+    val tripModel: TripsModel? = null
 ) {
     fun toPaginatedTripCategoryModel(): List<PaginatedTripCategoryModel> {
-        return tripModel.scheduledModel.map { data ->
+        return tripModel?.scheduledModel?.map { data ->
             PaginatedTripCategoryModel(
                 id = tripModel.id,
                 name = tripModel.name,
@@ -28,6 +28,7 @@ data class TripScheduleModel(
                 )
             )
         }
+            ?: listOf()
 
     }
 }
