@@ -14,16 +14,12 @@ fun Application.configureTripsRouting() {
     routing {
 
 
-        get("/trip/availables") {
-            //    val req = call.receive<TripAvailablePaginationRequestModel>()
+        post("/trip/availables") {
+            val req = call.receive<TripAvailablePaginationRequestModel>()
             val useCase = getPaginatedTripDetailUseCase()
 
             when (val result = useCase(
-                TripAvailablePaginationRequestModel(
-                    category = "fcddf318-367c-444d-ab3d-f109b008ee53",
-                    startingAmount = 5000,
-                    endingAmount = 9000
-                )
+                req
             )) {
 
                 is OperationResult.Success<*> -> {

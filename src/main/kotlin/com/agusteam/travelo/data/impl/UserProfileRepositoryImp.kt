@@ -6,7 +6,6 @@ import com.agusteam.travelo.domain.interfaces.UserProfileRepository
 import com.agusteam.travelo.domain.models.BusinessProfileModel
 import com.agusteam.travelo.domain.models.CreateBusinessProfileModel
 import com.agusteam.travelo.domain.models.UserProfileDetailsModel
-import com.agusteam.travelo.domain.usecase.CreteBusinessProfileUseCase
 
 class UserProfileRepositoryImp(val dao: UserProfileDao) : UserProfileRepository {
     override suspend fun getUserProfile(id: String): OperationResult<UserProfileDetailsModel> {
@@ -45,4 +44,21 @@ class UserProfileRepositoryImp(val dao: UserProfileDao) : UserProfileRepository 
             OperationResult.Error(e)
         }
     }
+
+    override suspend fun getTripsOfferCount(id: String): OperationResult<Int> {
+        return try {
+            val result = dao.getOfferTripsByProvider(id)
+            OperationResult.Success(result)
+        } catch (e: Exception) {
+            OperationResult.Error(e)
+        }
+    }
+
+    override suspend fun getTotalActiveTrips(id: String): OperationResult<Int> {
+        return try {
+            val result = dao.getTotalActiveTrips(id)
+            OperationResult.Success(result)
+        } catch (e: Exception) {
+            OperationResult.Error(e)
+        }    }
 }

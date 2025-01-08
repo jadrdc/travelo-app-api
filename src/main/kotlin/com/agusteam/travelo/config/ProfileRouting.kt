@@ -1,12 +1,10 @@
 package com.agusteam.travelo.config
 
+import com.agusteam.travelo.*
 import com.agusteam.travelo.data.core.OperationResult
 import com.agusteam.travelo.domain.mappers.mapToTripProfileModel
 import com.agusteam.travelo.domain.models.*
-import com.agusteam.travelo.geBusinessProfileDetailsUseCase
-import com.agusteam.travelo.getGetBusinessProfileUseCase
-import com.agusteam.travelo.getGetProfileDetailsUseCase
-import com.agusteam.travelo.getGetUpcomingTripsByModelUseCase
+import com.agusteam.travelo.models.TripProviderOfferCount
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -16,6 +14,82 @@ import io.ktor.server.routing.*
 fun Application.configureProfileRouting() {
     routing {
 
+        get("/business/totaltrips/{id}") {
+            val req = call.parameters["id"]
+            val useCase = getGetTripOfferUseCase()
+            try {
+
+
+                if (req == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Missing id")
+                } else {
+                    when (val result = useCase(req)) {
+                        is OperationResult.Error<*> -> {
+                            val errorResponse = ErrorResponse(
+                                status = HttpStatusCode.BadRequest.value,
+                                error = "Bad Request",
+                                message = result.exception.localizedMessage ?: "An error occurred"
+                            )
+                            call.respond(
+                                HttpStatusCode.BadRequest,
+                                errorResponse
+                            )
+                        }
+
+                        is OperationResult.Success<*> -> {
+                            call.respond(
+                                HttpStatusCode.OK,
+                                TripProviderOfferCount(result.data as Int)
+                            )
+                        }
+                    }
+
+                }
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    e.localizedMessage
+                )
+            }
+        }
+        get("/business/totalactive/{id}") {
+            val req = call.parameters["id"]
+            val useCase = getGetProviderTotalActiveTripUseCase()
+            try {
+
+
+                if (req == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Missing id")
+                } else {
+                    when (val result = useCase(req)) {
+                        is OperationResult.Error<*> -> {
+                            val errorResponse = ErrorResponse(
+                                status = HttpStatusCode.BadRequest.value,
+                                error = "Bad Request",
+                                message = result.exception.localizedMessage ?: "An error occurred"
+                            )
+                            call.respond(
+                                HttpStatusCode.BadRequest,
+                                errorResponse
+                            )
+                        }
+
+                        is OperationResult.Success<*> -> {
+                            call.respond(
+                                HttpStatusCode.OK,
+                                TripProviderOfferCount(result.data as Int)
+                            )
+                        }
+                    }
+
+                }
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    e.localizedMessage
+                )
+            }
+        }
         get("/getBusinessUpcomingTrips/{id}") {
             val request = call.parameters["id"] ?: ""
             val useCase = getGetUpcomingTripsByModelUseCase()

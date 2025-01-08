@@ -90,6 +90,9 @@ class TripsDao(supabase: SupabaseClient) {
         )
         val response = db.from("trips_categories").select(columns = columns) {
             filter {
+                if (requestModel.endingAmount > 0) {
+                    lte("trip_id.scheduledModel.total_payment", requestModel.endingAmount)
+                }
                 eq("category_id", requestModel.category)
                 eq("trip_id.trip_scheduled.is_active", true)
             }
@@ -157,5 +160,4 @@ class TripsDao(supabase: SupabaseClient) {
     suspend fun insertTrip(model: CreateTripModel) {
         db.from("trips").insert(model)
     }
-
 }
