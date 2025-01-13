@@ -39,5 +39,6 @@ dependencies {
     implementation("io.insert-koin:koin-logger-slf4j:3.5.6")
     implementation("ch.qos.logback:logback-classic:1.4.14")
     implementation("io.insert-koin:koin-ktor:3.5.6")
+    implementation("com.stripe:stripe-java:28.0.0")
 
 }

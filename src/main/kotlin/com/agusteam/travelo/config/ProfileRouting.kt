@@ -4,7 +4,6 @@ import com.agusteam.travelo.*
 import com.agusteam.travelo.data.core.OperationResult
 import com.agusteam.travelo.domain.mappers.mapToTripProfileModel
 import com.agusteam.travelo.domain.models.*
-import com.agusteam.travelo.models.TripProviderOfferCount
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

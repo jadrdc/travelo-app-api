@@ -1,10 +1,6 @@
 package com.agusteam.travelo.data.dao
 
-import com.agusteam.travelo.domain.models.BusinessProfileModel
-import com.agusteam.travelo.domain.models.CreateBusinessProfileModel
-import com.agusteam.travelo.domain.models.UpcomingTripModelListResponse
-import com.agusteam.travelo.domain.models.UserProfileDetailsModel
-import com.agusteam.travelo.models.TripsID
+import com.agusteam.travelo.domain.models.*
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns

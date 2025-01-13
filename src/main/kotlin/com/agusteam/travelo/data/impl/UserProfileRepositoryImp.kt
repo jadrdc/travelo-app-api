@@ -34,11 +34,7 @@ class UserProfileRepositoryImp(val dao: UserProfileDao) : UserProfileRepository 
     override suspend fun getBusinessProfile(id: String): OperationResult<List<BusinessProfileModel>> {
         return try {
             val result = dao.getBusinessProfile(id)
-            if (result == null) {
-                OperationResult.Error(Exception("Perfil no encontrado"))
-            } else {
-                OperationResult.Success(result)
-            }
+            OperationResult.Success(result)
 
         } catch (e: Exception) {
             OperationResult.Error(e)

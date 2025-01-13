@@ -1,4 +1,4 @@
-package com.agusteam.travelo.models
+package com.agusteam.travelo.domain.models
 
 import kotlinx.serialization.Serializable
 
