@@ -3,8 +3,9 @@ package com.agusteam.travelo.config
 import com.agusteam.travelo.data.core.OperationResult
 import com.agusteam.travelo.data.dao.PaymentDao
 import com.agusteam.travelo.data.impl.PaymentRepositoryImp
-import com.agusteam.travelo.domain.models.ProcessPendingOrderRequestModel
-import com.agusteam.travelo.domain.models.toOrder
+import com.agusteam.travelo.domain.models.*
+import com.agusteam.travelo.domain.usecase.ProccessOrderFailureUseCase
+import com.agusteam.travelo.domain.usecase.ProccessOrderSucessUseCase
 import com.agusteam.travelo.domain.usecase.ProccessOrderTripUseCase
 import com.agusteam.travelo.getAdminSupaBase
 import io.ktor.http.*
@@ -27,7 +28,53 @@ fun Application.configurePaymentRouting() {
                 is OperationResult.Success -> {
                     call.respond(
                         HttpStatusCode.OK,
-                        "Payment was set"
+                        PaymentPendingOrder(result.data ?: "")
+                    )
+                }
+
+                is OperationResult.Error -> {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        result.exception.localizedMessage
+                    )
+                }
+            }
+        }
+        post("/order-failure") {
+            val request = call.receive<ProcessOrderFailureRequest>()
+            if (request.order.isBlank() || request.reason.isBlank() || request.tripscheduled.isBlank()) {
+                call.respond(HttpStatusCode.BadRequest, "missing informationx¬")
+
+            }
+            val useCase = ProccessOrderFailureUseCase(PaymentRepositoryImp(PaymentDao(getAdminSupaBase())))
+
+            when (val result = useCase(request.toDomain())) {
+                is OperationResult.Success -> {
+                    call.respond(
+                        HttpStatusCode.OK, true
+                    )
+                }
+
+                is OperationResult.Error -> {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        result.exception.localizedMessage
+                    )
+                }
+            }
+        }
+        post("/order-sucess") {
+            val request = call.receive<OrderSucess>()
+            if (request.order.isBlank()) {
+                call.respond(HttpStatusCode.BadRequest, "missing informationx¬")
+
+            }
+            val useCase = ProccessOrderSucessUseCase(PaymentRepositoryImp(PaymentDao(getAdminSupaBase())))
+
+            when (val result = useCase(request.order)) {
+                is OperationResult.Success -> {
+                    call.respond(
+                        HttpStatusCode.OK, true
                     )
                 }
 

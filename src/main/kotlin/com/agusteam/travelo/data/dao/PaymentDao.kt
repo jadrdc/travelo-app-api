@@ -1,5 +1,6 @@
 package com.agusteam.travelo.data.dao
 
+import com.agusteam.travelo.domain.models.OrderFailureModel
 import com.agusteam.travelo.domain.models.OrderModel
 import com.agusteam.travelo.domain.models.TripScheduleQuorumModel
 import io.github.jan.supabase.SupabaseClient
@@ -11,7 +12,28 @@ import kotlinx.serialization.json.put
 class PaymentDao(supabase: SupabaseClient) {
     val db = supabase.postgrest
 
-    suspend fun processOrder(order: OrderModel) {
+
+    suspend fun processOrderFailure(order: OrderFailureModel): Boolean {
+        val params = buildJsonObject {
+            put("order_id", order.order_id)
+            put("reason", order.reason)
+            put("tripscheduled", order.tripscheduled)
+        }
+        db.rpc("process_order_failure", parameters = params) {
+        }
+        return true
+    }
+
+    suspend fun processOrderSucess(order: String): Boolean {
+        val params = buildJsonObject {
+            put("order_id", order)
+        }
+        db.rpc("process_order_sucess", parameters = params) {
+        }
+        return true
+    }
+
+    suspend fun processOrder(order: OrderModel): String {
         val details = getTripSchedule(order.trip_schedule_id)
         if (details != null) {
             if (details.available > 0) {
@@ -20,8 +42,9 @@ class PaymentDao(supabase: SupabaseClient) {
                     put("tripscheduled", order.trip_schedule_id)
                 }
 
-                val result = db.rpc("process_payment_pending", parameters = params) {
-                }
+                return db.rpc("process_payment_pending", parameters = params) {
+                }.data.replace("\"", "")
+
 
             } else {
                 throw Exception("Trip has not available space for reserving")
