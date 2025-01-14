@@ -82,6 +82,7 @@ class TripsDao(supabase: SupabaseClient) {
        lat,
        lng,images,cancellation_policy, businessModel:business_id(id,name,phone,email,description,rnc,image,address,created_at),
             scheduledModel:trip_scheduled(
+                id,
                 leaving_time,
                 returning_time,
                 total_payment,

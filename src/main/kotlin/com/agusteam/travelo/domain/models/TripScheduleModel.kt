@@ -19,6 +19,7 @@ data class TripScheduleModel(
                 cancellation_policy = tripModel.cancellation_policy,
                 businessModel = tripModel.businessModel,
                 details = TripDetails(
+                    id = data.id,
                     initial_payment = data.initial_payment,
                     returning_time = data.returning_time,
                     leaving_time = data.leaving_time,
