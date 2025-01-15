@@ -7,5 +7,5 @@ import com.agusteam.travelo.domain.models.OrderModel
 interface PaymentRepository {
     suspend fun processOrder(orderModel: OrderModel): OperationResult<String>
     suspend fun processOrderFailure(orderModel: OrderFailureModel): OperationResult<Boolean>
-    suspend fun processOrderSucess(order:String): OperationResult<Boolean>
+    suspend fun processOrderSucess(order: String, transactionId: String): OperationResult<Boolean>
 }

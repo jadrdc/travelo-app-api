@@ -71,7 +71,7 @@ fun Application.configurePaymentRouting() {
             }
             val useCase = ProccessOrderSucessUseCase(PaymentRepositoryImp(PaymentDao(getAdminSupaBase())))
 
-            when (val result = useCase(request.order)) {
+            when (val result = useCase(request.order,request.transactionId)) {
                 is OperationResult.Success -> {
                     call.respond(
                         HttpStatusCode.OK, true

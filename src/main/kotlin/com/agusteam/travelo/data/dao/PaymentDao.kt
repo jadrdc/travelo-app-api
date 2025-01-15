@@ -24,9 +24,10 @@ class PaymentDao(supabase: SupabaseClient) {
         return true
     }
 
-    suspend fun processOrderSucess(order: String): Boolean {
+    suspend fun processOrderSucess(order: String,transactionId:String): Boolean {
         val params = buildJsonObject {
             put("order_id", order)
+            put("transactionid", transactionId)
         }
         db.rpc("process_order_sucess", parameters = params) {
         }

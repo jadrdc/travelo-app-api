@@ -16,9 +16,9 @@ class PaymentRepositoryImp(val dao: PaymentDao) : PaymentRepository {
         }
     }
 
-    override suspend fun processOrderSucess(order: String): OperationResult<Boolean> {
+    override suspend fun processOrderSucess(order: String,transactionId:String): OperationResult<Boolean> {
         return try {
-            val result = dao.processOrderSucess(order)
+            val result = dao.processOrderSucess(order,transactionId)
             OperationResult.Success(result)
         } catch (e: Exception) {
             OperationResult.Error(e)
