@@ -12,4 +12,5 @@ interface TripRepository {
     suspend fun getActiveTrips(req: TripAvailablePaginationRequestModel): OperationResult<List<PaginatedTripCategoryModel>>
     suspend fun getUpcomingTrips(providerId: String): OperationResult<List<UpcomingTripModelListResponse>>
     suspend fun getFavoriteTripList(userId: String): OperationResult<List<PaginatedFavoriteTripModel>>
+    suspend fun isFavoriteTrip(userId: String, tripId: String): OperationResult<Boolean>
 }

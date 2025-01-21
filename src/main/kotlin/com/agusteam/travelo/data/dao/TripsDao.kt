@@ -9,6 +9,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.util.*
 
 
@@ -59,7 +60,6 @@ class TripsDao(supabase: SupabaseClient) {
         )
 
         val result = db.from("trip_scheduled").select(columns = columns) {
-            limit(5)
             filter { UpcomingTripModelListResponse::is_active eq true }
             filter {
                 eq("trip_id.business_id", businessId) // Filter based on the business_id in tripModel
@@ -102,7 +102,7 @@ class TripsDao(supabase: SupabaseClient) {
         val result = response.decodeList<TripScheduleModel>().filter { true }
             .filter { it.tripModel?.scheduledModel?.isNotEmpty() == true }
             .flatMap { it.toPaginatedTripCategoryModel() }.sortedBy { it.details.leaving_time }
-        return if (!requestModel.search.isNullOrBlank()) {
+        val resultList = if (!requestModel.search.isNullOrBlank()) {
             result.filter {
                 it.name.lowercase(Locale.getDefault())
                     .contains(requestModel.search.lowercase(Locale.getDefault()))
@@ -111,8 +111,18 @@ class TripsDao(supabase: SupabaseClient) {
         } else {
             result
         }
-
-
+        //  return  resultList
+        return coroutineScope {
+            resultList.map { trip ->
+                async {
+                    val isFavorite = doesFavoriteTripExist(
+                        "9811c69f-8b55-4128-b366-d917176e75d2",
+                        "f2606221-18ca-452e-bf5a-205990c05fd4"
+                    )
+                    trip.copy(isFavorite = true)
+                }
+            }.awaitAll() // Wait for all async calls to complete and return the result
+        }
     }
 
     suspend fun setFavoriteTrip(model: FavoriteTripModel) {
@@ -134,14 +144,14 @@ class TripsDao(supabase: SupabaseClient) {
         }
     }
 
-    suspend fun doesFavoriteTripExist(userId: String, tripId: String): String {
-        val result = db.rpc("is_trip_favorite", parameters = buildJsonObject {
-            /*  put("userid", userId)
-              put(
-                  "tripid", tripId
-              )*/
-        })
-        return result.data
+    suspend fun doesFavoriteTripExist(userId: String, tripId: String): Boolean {
+        val params = buildJsonObject {
+            put("userid", userId)
+            put("tripid", tripId)
+        }
+
+        val result = db.rpc("is_trip_favorite", parameters = params).decodeAs<Boolean>()
+        return result
     }
 
     suspend fun getTripsPagination(): List<PaginatedTripModel> {
@@ -163,7 +173,7 @@ class TripsDao(supabase: SupabaseClient) {
                         userId = "0d7f08cf-9a8d-47a3-9a30-37793374a2be",
                         tripId = "099bdb34-7cc5-45f4-9e1e-c02b97d6c6d2",
                     )
-                    trip.copy(isFavorite = isFavorite)
+                    trip.copy(isFavorite = "")
                 }
             }.awaitAll() // Wait for all async calls to complete and return the result
         }

@@ -14,4 +14,5 @@ data class PaginatedTripCategoryModel(
     val cancellation_policy: String,
     val businessModel: BusinessProviderTripModel,
     val details: TripDetails,
+    val isFavorite: Boolean = false
 )

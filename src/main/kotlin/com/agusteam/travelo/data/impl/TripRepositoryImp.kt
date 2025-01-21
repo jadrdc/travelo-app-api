@@ -85,4 +85,12 @@ class TripRepositoryImp(val dao: TripsDao) : TripRepository {
             OperationResult.Error(e)
         }
     }
+
+    override suspend fun isFavoriteTrip(userId: String, tripId: String): OperationResult<Boolean> {
+        return try {
+            val result = dao.doesFavoriteTripExist(userId = userId,tripId=tripId)
+            OperationResult.Success(result)
+        } catch (e: Exception) {
+            OperationResult.Error(e)
+        }    }
 }

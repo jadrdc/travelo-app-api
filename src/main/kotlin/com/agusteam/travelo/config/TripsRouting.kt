@@ -2,6 +2,8 @@ package com.agusteam.travelo.config
 
 import com.agusteam.travelo.*
 import com.agusteam.travelo.data.core.OperationResult
+import com.agusteam.travelo.data.dao.TripsDao
+import com.agusteam.travelo.data.impl.TripRepositoryImp
 import com.agusteam.travelo.domain.models.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -12,7 +14,30 @@ import io.ktor.server.routing.*
 
 fun Application.configureTripsRouting() {
     routing {
+        post("/favorite/e") {
+            val trp = TripRepositoryImp(TripsDao(getAdminSupaBase()))
+            val result =
+                trp.isFavoriteTrip("9811c69f-8b55-4128-b366-d917176e75d2",
+                    "f2606221-18ca-452e-bf5a-205990c05fd4")
+            when (result) {
+                is OperationResult.Error -> {
+                    val errorResponse = ErrorResponse(
+                        status = HttpStatusCode.BadRequest.value,
+                        error = "Bad Request",
+                        message = result.exception.localizedMessage ?: "An error occurred"
+                    )
+                    call.respond(
+                        HttpStatusCode.BadRequest, errorResponse
+                    )
+                }
 
+                is OperationResult.Success -> {
+                    call.respond(
+                        HttpStatusCode.OK, result.data
+                    )
+                }
+            }
+        }
 
         post("/trip/availables") {
             val req = call.receive<TripAvailablePaginationRequestModel>()
@@ -35,8 +60,7 @@ fun Application.configureTripsRouting() {
                         message = result.exception.localizedMessage ?: "An error occurred"
                     )
                     call.respond(
-                        HttpStatusCode.BadRequest,
-                        errorResponse
+                        HttpStatusCode.BadRequest, errorResponse
                     )
                 }
             }
@@ -63,8 +87,7 @@ fun Application.configureTripsRouting() {
                         message = result.exception.localizedMessage ?: "An error occurred"
                     )
                     call.respond(
-                        HttpStatusCode.BadRequest,
-                        errorResponse
+                        HttpStatusCode.BadRequest, errorResponse
                     )
                 }
             }
@@ -79,8 +102,7 @@ fun Application.configureTripsRouting() {
                         message = result.exception.localizedMessage ?: "An error occurred"
                     )
                     call.respond(
-                        HttpStatusCode.BadRequest,
-                        errorResponse
+                        HttpStatusCode.BadRequest, errorResponse
                     )
 
                 }
@@ -97,8 +119,7 @@ fun Application.configureTripsRouting() {
         delete("trip/favorite") {
             val request = call.receive<FavoriteTripModel>()
             val useCase = getRemoveFavoriteTripUsecase()
-            when (val result = useCase(request)
-            ) {
+            when (val result = useCase(request)) {
                 is OperationResult.Error<*> -> {
                     val errorResponse = ErrorResponse(
                         status = HttpStatusCode.BadRequest.value,
@@ -148,8 +169,7 @@ fun Application.configureTripsRouting() {
         post("trip/favorite") {
             val request = call.receive<FavoriteTripModel>()
             val useCase = getSetFavoriteTripUsecase()
-            when (val result = useCase(request)
-            ) {
+            when (val result = useCase(request)) {
                 is OperationResult.Error<*> -> {
                     val errorResponse = ErrorResponse(
                         status = HttpStatusCode.BadRequest.value,
@@ -181,8 +201,7 @@ fun Application.configureTripsRouting() {
                         message = result.exception.localizedMessage ?: "An error occurred"
                     )
                     call.respond(
-                        HttpStatusCode.BadRequest,
-                        errorResponse
+                        HttpStatusCode.BadRequest, errorResponse
                     )
 
                 }

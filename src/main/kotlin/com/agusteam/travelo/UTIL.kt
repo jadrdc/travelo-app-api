@@ -188,14 +188,14 @@ fun getErrorMessage(errorCode: String): String {
 
 // Define a sealed class for custom error handling
 sealed class RestError {
-    object BadRequest : RestError()
-    object Unauthorized : RestError()
-    object Forbidden : RestError()
-    object NotFound : RestError()
-    object Conflict : RestError()
-    object TooManyRequests : RestError()
-    object InternalServerError : RestError()
-    object ServiceUnavailable : RestError()
+    data object BadRequest : RestError()
+    data object Unauthorized : RestError()
+    data object Forbidden : RestError()
+    data object NotFound : RestError()
+    data object Conflict : RestError()
+    data object TooManyRequests : RestError()
+    data object InternalServerError : RestError()
+    data object ServiceUnavailable : RestError()
     data class CustomError(val message: String) : RestError()
     data class UnknownError(val exception: Exception) : RestError()
 }
@@ -217,8 +217,7 @@ fun mapToRestError(exception: UnknownRestException): RestError {
 
 // Example usage
 fun handleApiException(exception: UnknownRestException): String {
-    val error = mapToRestError(exception)
-    return when (error) {
+    return when (val error = mapToRestError(exception)) {
         is RestError.BadRequest -> "Solicitud incorrecta: Verifica los datos enviados en la solicitud."
         is RestError.Unauthorized -> "No autorizado: Revisa tu clave API o token de autenticación."
         is RestError.Forbidden -> "Prohibido: No tienes permisos para acceder a este recurso."

@@ -27,4 +27,5 @@ fun Application.module() {
     configureCategoryRouting()
     configureTripsRouting()
     configurePaymentRouting()
+    orderRouting()
 }

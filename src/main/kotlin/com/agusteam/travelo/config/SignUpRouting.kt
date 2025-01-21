@@ -1,12 +1,7 @@
 package com.agusteam.travelo.config
 
 import com.agusteam.travelo.data.core.OperationResult
-import com.agusteam.travelo.domain.models.ConfirmEmailModel
-import com.agusteam.travelo.domain.models.ErrorResponse
-import com.agusteam.travelo.domain.models.LoginModel
-import com.agusteam.travelo.domain.models.LogonUserModel
-import com.agusteam.travelo.domain.models.RequestPasswordChangeModel
-import com.agusteam.travelo.domain.models.UserSignupModel
+import com.agusteam.travelo.domain.models.*
 import com.agusteam.travelo.getSignUpUseCase
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -19,8 +14,7 @@ fun Application.configureSignUpFlowApi() {
         post("/resetPasswordForEmail") {
             val request = call.receive<RequestPasswordChangeModel>()
             val useCase = getSignUpUseCase()
-            val result = useCase.resetPasswordForEmail(request)
-            when (result) {
+            when (val result = useCase.resetPasswordForEmail(request)) {
                 is OperationResult.Error<*> -> {
                     val errorResponse = ErrorResponse(
                         status = HttpStatusCode.BadRequest.value,
