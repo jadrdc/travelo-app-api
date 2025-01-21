@@ -37,8 +37,7 @@ fun Application.configureSignUpFlowApi() {
         post("/confirmEmail") {
             val request = call.receive<ConfirmEmailModel>()
             val useCase = getSignUpUseCase()
-            val result = useCase.confirmEmail(request)
-            when (result) {
+            when (val result = useCase.confirmEmail(request)) {
                 is OperationResult.Error<*> -> call.respond(
                     HttpStatusCode.BadRequest,
                     result.exception.localizedMessage
@@ -56,8 +55,7 @@ fun Application.configureSignUpFlowApi() {
             try {
                 val request = call.receive<LoginModel>()
                 val useCase = getSignUpUseCase()
-                val result = useCase.login(request)
-                when (result) {
+                when (val result = useCase.login(request)) {
                     is OperationResult.Error<*> -> {
                         val errorResponse = ErrorResponse(
                             status = HttpStatusCode.BadRequest.value,
@@ -83,8 +81,7 @@ fun Application.configureSignUpFlowApi() {
             try {
                 val request = call.receive<UserSignupModel>()
                 val useCase = getSignUpUseCase()
-                val result = useCase.signUpUser(request)
-                when (result) {
+                when (val result = useCase.signUpUser(request)) {
                     is OperationResult.Error<*> -> {
                         val errorResponse = ErrorResponse(
                             status = HttpStatusCode.BadRequest.value,

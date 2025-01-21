@@ -116,8 +116,7 @@ fun Application.configureProfileRouting() {
         get("/profile/{id}") {
             val request = call.parameters["id"] ?: ""
             val useCase = getGetProfileDetailsUseCase()
-            val result = useCase(request)
-            when (result) {
+            when (val result = useCase(request)) {
                 is OperationResult.Error<*> -> call.respond(
                     HttpStatusCode.BadRequest,
                     result.exception.localizedMessage
@@ -133,8 +132,7 @@ fun Application.configureProfileRouting() {
         post("/business") {
             val request = call.receive<CreateBusinessProfileModel>()
             val useCase = geBusinessProfileDetailsUseCase()
-            val result = useCase(request)
-            when (result) {
+            when (val result = useCase(request)) {
                 is OperationResult.Error<*> -> call.respond(
                     HttpStatusCode.BadRequest,
                     result.exception.localizedMessage
@@ -149,8 +147,7 @@ fun Application.configureProfileRouting() {
         post("/businessProfile") {
             val request = call.receive<GetBusinessProfileModel>()
             val useCase = getGetBusinessProfileUseCase()
-            val result = useCase(request.id)
-            when (result) {
+            when (val result = useCase(request.id)) {
                 is OperationResult.Error<*> -> call.respond(
                     HttpStatusCode.BadRequest,
                     result.exception.localizedMessage

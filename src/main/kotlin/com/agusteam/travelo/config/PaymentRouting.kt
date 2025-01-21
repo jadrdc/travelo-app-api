@@ -28,7 +28,7 @@ fun Application.configurePaymentRouting() {
                 is OperationResult.Success -> {
                     call.respond(
                         HttpStatusCode.OK,
-                        PaymentPendingOrder(result.data ?: "")
+                        PaymentPendingOrder(result.data)
                     )
                 }
 
